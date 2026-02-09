@@ -451,6 +451,16 @@ async def send_message(
         }
     )
     
+    # Send via Evolution API
+    if evolution_service:
+        settings = await db.settings.find_one({}, {"_id": 0})
+        instance = settings.get("evolution_instance", "default") if settings else "default"
+        phone = request.phone_number.replace("@s.whatsapp.net", "")
+        success = await evolution_service.send_text_message(instance, phone, request.message)
+        
+        if not success:
+            logger.warning(f"Failed to send message via Evolution API to {phone}")
+    
     return {"status": "success", "message": "Message sent"}
 
 app.include_router(api_router)
