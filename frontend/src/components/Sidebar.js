@@ -11,6 +11,7 @@ const Sidebar = () => {
   const navItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/conversations', icon: MessageSquare, label: 'Conversas' },
+    { path: '/instances', icon: Smartphone, label: 'Instâncias' },
     { path: '/prompts', icon: Bot, label: 'Prompts' },
     { path: '/webhook', icon: Webhook, label: 'Webhook' },
     { path: '/settings', icon: Settings, label: 'Configurações' },
