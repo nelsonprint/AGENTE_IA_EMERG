@@ -47,7 +47,7 @@ supabase_service: Optional[SupabaseService] = None
 # ============ AUTH ROUTES ============
 @api_router.post("/auth/register", response_model=TokenResponse)
 async def register(user_data: AdminUserCreate):
-    \"\"\"Register new admin user\"\"\"
+    Register new admin user
     # Check if user already exists
     existing_user = await db.admin_users.find_one({
         "$or": [
@@ -87,7 +87,7 @@ async def register(user_data: AdminUserCreate):
 
 @api_router.post("/auth/login", response_model=TokenResponse)
 async def login(credentials: AdminUserLogin):
-    \"\"\"Login admin user\"\"\"
+    Login admin user
     user = await db.admin_users.find_one({"username": credentials.username}, {"_id": 0})
     
     if not user or not verify_password(credentials.password, user["hashed_password"]):
@@ -110,7 +110,7 @@ async def login(credentials: AdminUserLogin):
 # ============ SETTINGS ROUTES ============
 @api_router.get("/settings", response_model=Settings)
 async def get_settings(current_user: dict = Depends(get_current_user)):
-    \"\"\"Get current settings\"\"\"
+    Get current settings
     settings = await db.settings.find_one({}, {"_id": 0})
     
     if not settings:
@@ -124,7 +124,7 @@ async def update_settings(
     settings_update: SettingsUpdate,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Update settings\"\"\"
+    Update settings
     global redis_service, supabase_service
     
     # Get existing settings or create new
@@ -168,7 +168,7 @@ async def update_settings(
 # ============ PROMPTS ROUTES ============
 @api_router.get("/prompts", response_model=List[BotPrompt])
 async def get_prompts(current_user: dict = Depends(get_current_user)):
-    \"\"\"Get all bot prompts\"\"\"
+    Get all bot prompts
     prompts = await db.bot_prompts.find({}, {"_id": 0}).to_list(1000)
     return [BotPrompt(**p) for p in prompts]
 
@@ -177,7 +177,7 @@ async def create_prompt(
     prompt_data: BotPromptCreate,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Create new bot prompt\"\"\"
+    Create new bot prompt
     prompt = BotPrompt(**prompt_data.model_dump())
     prompt_doc = prompt.model_dump()
     prompt_doc["created_at"] = prompt_doc["created_at"].isoformat()
@@ -192,7 +192,7 @@ async def update_prompt(
     prompt_update: BotPromptUpdate,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Update bot prompt\"\"\"
+    Update bot prompt
     existing = await db.bot_prompts.find_one({"id": prompt_id}, {"_id": 0})
     
     if not existing:
@@ -211,7 +211,7 @@ async def delete_prompt(
     prompt_id: str,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Delete bot prompt\"\"\"
+    Delete bot prompt
     result = await db.bot_prompts.delete_one({"id": prompt_id})
     
     if result.deleted_count == 0:
@@ -221,7 +221,7 @@ async def delete_prompt(
 
 @api_router.get("/prompts/active", response_model=BotPrompt)
 async def get_active_prompt():
-    \"\"\"Get active bot prompt (for webhook use)\"\"\"
+    Get active bot prompt (for webhook use)
     prompt = await db.bot_prompts.find_one({"is_active": True}, {"_id": 0})
     
     if not prompt:
@@ -240,7 +240,7 @@ async def get_conversations(
     status: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Get all conversations with optional status filter\"\"\"
+    Get all conversations with optional status filter
     query = {}
     if status:
         query["status"] = status
@@ -253,7 +253,7 @@ async def get_conversation(
     conversation_id: str,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Get specific conversation with messages\"\"\"
+    Get specific conversation with messages
     conversation = await db.conversations.find_one({"id": conversation_id}, {"_id": 0})
     
     if not conversation:
@@ -266,7 +266,7 @@ async def transfer_to_human(
     conversation_id: str,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Transfer conversation to human agent\"\"\"
+    Transfer conversation to human agent
     conversation = await db.conversations.find_one({"id": conversation_id}, {"_id": 0})
     
     if not conversation:
@@ -287,7 +287,7 @@ async def close_conversation(
     conversation_id: str,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Close conversation\"\"\"
+    Close conversation
     global redis_service
     
     conversation = await db.conversations.find_one({"id": conversation_id}, {"_id": 0})
@@ -309,7 +309,7 @@ async def close_conversation(
 # ============ WEBHOOK ROUTE ============
 @api_router.post("/webhook/{webhook_id}")
 async def webhook_handler(webhook_id: str, payload: dict):
-    \"\"\"Handle incoming WhatsApp messages from Evolution API\"\"\"
+    Handle incoming WhatsApp messages from Evolution API
     try:
         logger.info(f"Received webhook: {payload}")
         
@@ -431,7 +431,7 @@ async def webhook_handler(webhook_id: str, payload: dict):
 # ============ DASHBOARD STATS ============
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
-    \"\"\"Get dashboard statistics\"\"\"
+    Get dashboard statistics
     # Count active conversations
     active_conversations = await db.conversations.count_documents({"status": "active"})
     
@@ -467,7 +467,7 @@ async def send_message(
     request: SendMessageRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    \"\"\"Send manual message to WhatsApp user (for human agent)\"\"\"
+    Send manual message to WhatsApp user (for human agent)
     # Get conversation
     conversation = await db.conversations.find_one(
         {"phone_number": request.phone_number},
