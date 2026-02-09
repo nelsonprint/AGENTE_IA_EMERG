@@ -481,13 +481,18 @@ async def send_message(
     )
     
     # Send via Evolution API
-    if evolution_service:
-        settings = await db.settings.find_one({}, {"_id": 0})
-        instance = settings.get("evolution_instance", "default") if settings else "default"
+    default_instance = await db.evolution_instances.find_one({"is_default": True}, {"_id": 0})
+    
+    if default_instance:
+        instance_service = EvolutionAPIService(
+            default_instance["api_url"],
+            default_instance["api_key"]
+        )
+        instance_name = default_instance["instance_name"]
         phone = request.phone_number.replace("@s.whatsapp.net", "")
         
-        logger.info(f"Sending message to {phone} via instance {instance}")
-        success = await evolution_service.send_text_message(instance, phone, request.message)
+        logger.info(f"Sending message to {phone} via instance {instance_name}")
+        success = await instance_service.send_text_message(instance_name, phone, request.message)
         
         if not success:
             logger.warning(f"Failed to send message via Evolution API to {phone}")
@@ -495,7 +500,7 @@ async def send_message(
         
         return {"status": "success", "sent": True, "message": "Message sent"}
     else:
-        logger.warning("Evolution service not initialized")
+        logger.warning("No default Evolution instance configured")
         return {"status": "saved", "sent": False, "message": "Evolution API not configured"}
 
 @api_router.get("/evolution/test")
