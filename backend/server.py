@@ -394,8 +394,21 @@ async def webhook_handler(webhook_id: str, payload: dict):
             
             return {"status": "transferred_to_human"}
         
+        # Get conversation history for context
+        conversation_with_history = await db.conversations.find_one(
+            {"id": conversation["id"]},
+            {"_id": 0}
+        )
+        
         session_id = f"session_{phone_number}"
-        ai_response = await bot_service.generate_response(session_id, message_content)
+        conversation_history = conversation_with_history.get("messages", [])
+        
+        # Generate response with full conversation history
+        ai_response = await bot_service.generate_response(
+            session_id, 
+            message_content,
+            conversation_history
+        )
         
         bot_message = Message(
             conversation_id=conversation["id"],
