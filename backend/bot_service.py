@@ -19,7 +19,30 @@ class BotService:
             history.append(f"{role}: {msg['content']}")
         return "\n".join(history)
     
-    async def generate_response(self, session_id: str, user_message: str, conversation_history: List[Dict] = None) -> str:
+    def _replace_name_placeholders(self, text: str, customer_name: str) -> str:
+        """Replace name placeholders in the prompt with customer's actual name"""
+        if not customer_name or customer_name.lower() in ["unknown", "desconhecido", ""]:
+            customer_name = "Cliente"
+        
+        # Replace common placeholders
+        placeholders = [
+            "[Nome do Proprietário]",
+            "[Nome do Cliente]",
+            "[customer_name]",
+            "[nome]",
+            "{nome}",
+            "{customer_name}",
+            "{{nome}}",
+            "{{customer_name}}"
+        ]
+        
+        result = text
+        for placeholder in placeholders:
+            result = result.replace(placeholder, customer_name)
+        
+        return result
+    
+    async def generate_response(self, session_id: str, user_message: str, conversation_history: List[Dict] = None, customer_name: str = None) -> str:
         """Generate AI response using OpenAI with conversation history"""
         try:
             # Build context from history
@@ -30,8 +53,8 @@ class BotService:
                     role = "Cliente" if msg["sender"] == "user" else "Você"
                     context += f"{role}: {msg['content']}\n"
             
-            # Create prompt with history
-            full_prompt = self.system_message
+            # Create prompt with history and replace name placeholders
+            full_prompt = self._replace_name_placeholders(self.system_message, customer_name)
             if context:
                 full_prompt += context
             

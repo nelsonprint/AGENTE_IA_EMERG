@@ -403,11 +403,12 @@ async def webhook_handler(webhook_id: str, payload: dict):
         session_id = f"session_{phone_number}"
         conversation_history = conversation_with_history.get("messages", [])
         
-        # Generate response with full conversation history
+        # Generate response with full conversation history and customer name
         ai_response = await bot_service.generate_response(
             session_id, 
             message_content,
-            conversation_history
+            conversation_history,
+            customer_name=user_name
         )
         
         bot_message = Message(
