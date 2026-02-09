@@ -62,6 +62,16 @@ function App() {
             }
           />
           <Route
+            path="/instances"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <EvolutionInstances />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/prompts"
             element={
               <PrivateRoute>
