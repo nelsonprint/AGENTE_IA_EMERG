@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 
 redis_service: Optional[RedisService] = None
 supabase_service: Optional[SupabaseService] = None
+evolution_service: Optional[EvolutionAPIService] = None
 
 @api_router.post("/auth/register", response_model=TokenResponse)
 async def register(user_data: AdminUserCreate):
