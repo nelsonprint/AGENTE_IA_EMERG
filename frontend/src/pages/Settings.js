@@ -14,6 +14,7 @@ const Settings = () => {
   const { getAuthHeader } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
   const [showKeys, setShowKeys] = useState({});
   const [settings, setSettings] = useState({
     openai_api_key: '',
