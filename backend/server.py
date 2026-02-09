@@ -135,8 +135,16 @@ async def update_settings(
                 settings.get("redis_password")
             )
             await redis_service.connect()
+            if redis_service.client:
+                logger.info("✓ Redis cache enabled")
+            else:
+                logger.info("✗ Redis disabled - system will work without cache")
+                redis_service = None
         except Exception as e:
-            logger.error(f"Failed to connect to Redis: {e}")
+            logger.warning(f"Redis not available: {e}")
+            redis_service = None
+    else:
+        logger.info("Redis not configured - system will work without cache")
     
     if settings.get("supabase_url") and settings.get("supabase_key"):
         try:
