@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Conversations from './pages/Conversations';
 import Prompts from './pages/Prompts';
 import Settings from './pages/Settings';
+import WebhookConfig from './pages/WebhookConfig';
 import Sidebar from './components/Sidebar';
 import './App.css';
 
