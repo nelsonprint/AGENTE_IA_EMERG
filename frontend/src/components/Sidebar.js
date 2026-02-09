@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Settings, MessageSquare, FileText, LogOut, Bot } from 'lucide-react';
+import { LayoutDashboard, Settings, MessageSquare, FileText, LogOut, Bot, Webhook } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 
@@ -12,6 +12,7 @@ const Sidebar = () => {
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/conversations', icon: MessageSquare, label: 'Conversas' },
     { path: '/prompts', icon: Bot, label: 'Prompts' },
+    { path: '/webhook', icon: Webhook, label: 'Webhook' },
     { path: '/settings', icon: Settings, label: 'Configurações' },
   ];
 
