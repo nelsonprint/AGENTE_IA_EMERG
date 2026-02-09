@@ -29,6 +29,7 @@ class Settings(BaseModel):
     openai_api_key: Optional[str] = None
     evolution_api_url: Optional[str] = None
     evolution_api_key: Optional[str] = None
+    evolution_instance: Optional[str] = "default"
     supabase_url: Optional[str] = None
     supabase_key: Optional[str] = None
     redis_url: Optional[str] = None
@@ -39,6 +40,7 @@ class SettingsUpdate(BaseModel):
     openai_api_key: Optional[str] = None
     evolution_api_url: Optional[str] = None
     evolution_api_key: Optional[str] = None
+    evolution_instance: Optional[str] = None
     supabase_url: Optional[str] = None
     supabase_key: Optional[str] = None
     redis_url: Optional[str] = None
