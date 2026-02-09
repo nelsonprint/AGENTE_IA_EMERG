@@ -511,6 +511,87 @@ async def test_evolution_connection(current_user: dict = Depends(get_current_use
         "api_url": settings.get("evolution_api_url")
     }
 
+# ============ EVOLUTION INSTANCES MANAGEMENT ============
+@api_router.get("/evolution-instances", response_model=List[EvolutionInstance])
+async def get_evolution_instances(current_user: dict = Depends(get_current_user)):
+    """Get all Evolution API instances"""
+    instances = await db.evolution_instances.find({}, {"_id": 0}).to_list(1000)
+    return [EvolutionInstance(**inst) for inst in instances]
+
+@api_router.post("/evolution-instances", response_model=EvolutionInstance)
+async def create_evolution_instance(
+    instance_data: EvolutionInstanceCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create new Evolution API instance"""
+    # If this is the first instance, make it default
+    existing_count = await db.evolution_instances.count_documents({})
+    is_default = existing_count == 0
+    
+    instance = EvolutionInstance(
+        **instance_data.model_dump(),
+        is_default=is_default
+    )
+    instance_doc = instance.model_dump()
+    instance_doc["created_at"] = instance_doc["created_at"].isoformat()
+    
+    await db.evolution_instances.insert_one(instance_doc)
+    return instance
+
+@api_router.delete("/evolution-instances/{instance_id}")
+async def delete_evolution_instance(
+    instance_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete Evolution API instance"""
+    result = await db.evolution_instances.delete_one({"id": instance_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    
+    return {"message": "Instance deleted successfully"}
+
+@api_router.post("/evolution-instances/{instance_id}/set-default")
+async def set_default_instance(
+    instance_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Set instance as default"""
+    # Unset all defaults
+    await db.evolution_instances.update_many({}, {"$set": {"is_default": False}})
+    
+    # Set this one as default
+    result = await db.evolution_instances.update_one(
+        {"id": instance_id},
+        {"$set": {"is_default": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    
+    return {"message": "Default instance set successfully"}
+
+@api_router.post("/evolution-instances/{instance_id}/test")
+async def test_instance_connection(
+    instance_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Test specific Evolution API instance connection"""
+    instance = await db.evolution_instances.find_one({"id": instance_id}, {"_id": 0})
+    
+    if not instance:
+        raise HTTPException(status_code=404, detail="Instance not found")
+    
+    # Create temporary service to test
+    temp_service = EvolutionAPIService(instance["api_url"], instance["api_key"])
+    status = await temp_service.get_instance_status(instance["instance_name"])
+    
+    return {
+        "status": "success",
+        "instance": instance["instance_name"],
+        "connection": status
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
