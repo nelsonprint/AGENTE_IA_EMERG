@@ -71,6 +71,16 @@ function App() {
             }
           />
           <Route
+            path="/webhook"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <WebhookConfig />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/settings"
             element={
               <PrivateRoute>
