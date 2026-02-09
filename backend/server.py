@@ -41,6 +41,25 @@ redis_service: Optional[RedisService] = None
 supabase_service: Optional[SupabaseService] = None
 evolution_service: Optional[EvolutionAPIService] = None
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize Redis on startup"""
+    global redis_service
+    
+    # Try to connect to local Redis
+    redis_url = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379')
+    try:
+        redis_service = RedisService(redis_url, None)
+        await redis_service.connect()
+        if redis_service.client:
+            logger.info("✓ Redis initialized successfully for conversation memory")
+        else:
+            logger.warning("Redis not available - conversation memory disabled")
+            redis_service = None
+    except Exception as e:
+        logger.warning(f"Redis not available: {e}")
+        redis_service = None
+
 @api_router.post("/auth/register", response_model=TokenResponse)
 async def register(user_data: AdminUserCreate):
     existing_user = await db.admin_users.find_one({
