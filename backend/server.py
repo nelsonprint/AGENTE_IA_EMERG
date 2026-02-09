@@ -18,6 +18,7 @@ from auth import hash_password, verify_password, create_access_token, get_curren
 from bot_service import BotService
 from redis_service import RedisService
 from supabase_service import SupabaseService
+from evolution_service import EvolutionAPIService
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
