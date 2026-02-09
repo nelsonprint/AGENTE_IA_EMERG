@@ -1,0 +1,175 @@
+<analysis>**original_problem_statement:**
+The user wants to build a web application that replaces and enhances an existing N8N automation for a WhatsApp bot.
+
+**PRODUCT REQUIREMENTS:**
+- A complete web app with a login/password system.
+- A dashboard to manage API keys for various services (OpenAI, Evolution API, Supabase, Redis). The user must be able to add these keys through the dashboard, with nothing hardcoded.
+- A dashboard to create and manage custom prompts for the AI.
+- The user's preferred LLM is GPT-4o-mini (OpenAI).
+- The database should be Supabase.
+- The application should feature real-time conversation monitoring, conversation history, and a panel to transfer conversations to a human agent.
+- The system must handle incoming messages via a webhook from the Evolution API and send replies back through it.
+- The system should support managing multiple Evolution API instances.
+- The AI must maintain conversation history/memory.
+- A feature to dynamically insert the customer's name into the prompt is required.
+
+**User's preferred language**:
+Português (Brasil). The next agent MUST respond in Portuguese.
+
+**what currently exists?**
+A full-stack web application has been built.
+- **Backend:** A Flask application () with SQLAlchemy models for , , , , and . It connects to a Supabase (PostgreSQL) database for persistence and a local Redis instance for session management. It exposes REST APIs for managing settings, prompts, Evolution API instances, and conversations. It includes a webhook endpoint to receive messages from the Evolution API, process them with an AI service, and send replies.
+- **Frontend:** A React application featuring a login page and a dashboard with pages for:
+    - Real-time conversations ().
+    - Managing prompts ().
+    - Managing system settings (), including API keys.
+    - Managing multiple Evolution API instances ().
+    - A guide page for webhook configuration ().
+- **Integrations:** The application is integrated with OpenAI for AI responses and the Evolution API for WhatsApp messaging.
+
+**Last working item**:
+    - Last item agent was working: The user requested a feature to dynamically pull the customer's name (e.g., from their WhatsApp profile) and insert it into the AI prompt, for example, *Olá [Nome do Proprietário],*. The agent acknowledged the request but did not start the implementation.
+    - Status: NOT STARTED
+    - Agent Testing Done: N
+    - Which testing method agent to use? backend testing agent. The test should involve sending a webhook payload that includes a  and verifying that the prompt sent to the LLM includes this name.
+    - User Testing Done: N
+
+**All Pending/In progress Issue list**:
+  - **Issue 1 (P0):** Implement dynamic name substitution in prompts.
+
+  Issues Detail:
+  - **Issue 1:** Implement dynamic name substitution in prompts.
+     - **Attempted fixes:** None.
+     - **Next debug checklist:**
+       1.  **Backend ():** In the  function, extract the sender's name from the incoming webhook payload. The Evolution API typically sends this as  in the message object.
+       2.  **Backend ():** Modify the  function to accept the customer's name as an argument.
+       3.  **Backend ():** Before calling the LLM, perform a string replacement on the prompt content, replacing a placeholder like  or  with the actual name.
+       4.  **Backend ():** Update the call to  to pass the extracted name.
+     - **Why fix this issue and what will be achieved with the fix?** This will personalize the AI's communication, making the interaction more engaging and human-like, which was a specific user request.
+     - **Status:** NOT STARTED
+     - **Is recurring issue?** N
+     - **Should Test frontend/backend/both after fix?** Backend.
+     - **Blocked on other issue:** None.
+
+**In progress Task List**:
+There are no tasks currently in progress.
+
+**Upcoming and Future Tasks**
+**Upcoming Tasks:**
+- **P0: Implement Dynamic Name in Prompt:** As detailed in the Pending Issue list.
+
+**Future Tasks:**
+- **P1: Verify Real-time Conversation Monitoring:** The  page exists, but its real-time update capability (e.g., via WebSockets or polling) has not been fully implemented or verified. The current implementation likely just fetches history on page load.
+- **P2: Implement Human Handoff Feature:** The initial requirements mentioned a painel de transferência para atendimento humano. While the basic structure is there, the actual functionality to flag a conversation for a human, pause the bot, and notify an agent is not implemented.
+- **P3: Refine Prompt Management:** The user provided a complex prompt with rules about timing and multi-message replies. The agent correctly identified that these are not feasible. However, the UI/UX for prompt management could be enhanced to guide the user on creating effective prompts for the current single-reply architecture.
+
+**Completed work in this session**
+- **Application Scaffolding:** Created the complete file structure for the Flask backend and React frontend.
+- **Database and Models:** Set up Supabase (PostgreSQL) connection and defined SQLAlchemy models for all necessary entities.
+- **UI Implementation:** Built all core frontend pages: Login, Dashboard, Settings, Prompts, Conversations, and Instance Management.
+- **Evolution API Integration:**
+    - Implemented services to send messages via the Evolution API.
+    - Created a webhook endpoint to receive incoming messages.
+    - Added a UI to manage multiple Evolution API instances.
+- **Redis Integration for Session Memory:**
+    - Initially made Redis optional, but after user feedback, correctly identified it as essential for conversation memory.
+    - Installed Redis server and configured the backend to use it for storing conversation context, fixing a critical bug where the AI had no memory.
+- **Conversation History Fix:** Reworked the  to manually fetch conversation history from the database and pass it to the LLM, solving an issue where the  library was not persisting session data correctly.
+- **Bug Fixes:** Resolved several critical issues, including incorrect docstring formatting in Python, a timezone-related bug, and Redis connection errors.
+- **Documentation:** Created a  file and provided in-chat guidance to the user on configuring webhooks and finding their Evolution API instance name.
+
+**Earlier issues found/mentioned but not fixed**
+None. The agent has addressed all issues raised by the user so far, with the exception of the most recent feature request which is now the top priority.
+
+**Known issue recurrence from previous fork**
+N/A
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+- **Backend:** Flask, Python, SQLAlchemy (ORM)
+- **Frontend:** React.js, JavaScript, CSS
+- **Database:** PostgreSQL (via Supabase)
+- **Session/Cache:** Redis
+- **Architecture:** REST API, Service-oriented structure in the backend.
+- **CI/CD:** Uses  to manage backend and frontend processes.
+- **WhatsApp Integration:** Evolution API
+
+**key DB schema**
+- **settings:** 
+- **prompts:** 
+- **evolution_instances:** 
+- **conversations:** 
+- **messages:** 
+
+**changes in tech stack**
+None.
+
+**All files of reference**
+- : The main Flask application file containing all API endpoints, database initialization, and middleware.
+- : Contains the logic for interacting with the LLM and managing conversation history. Was heavily modified to fix the memory issue.
+- : Contains the logic for handling incoming webhook calls from the Evolution API.
+- : Service to abstract interactions with the Evolution API.
+- : SQLAlchemy model definitions for all database tables.
+- : React component for the settings page, where API keys are configured.
+- : React component for managing multiple Evolution API instances.
+- : Main React component that defines the application's routing.
+
+**Areas that need refactoring**:
+- **Conversation History Loading:** The logic in  to manually fetch history and pass it to  is functional but could be encapsulated within the  itself to make the webhook handler cleaner. The service could receive a  and be responsible for its own state management.
+- **Settings Management:** API keys and settings are loaded from the database on each request. This could be cached (e.g., in a global Flask object or a simple in-memory cache) on startup or when updated to reduce database queries.
+
+**key api endpoints**
+- : Receives messages from the Evolution API.
+- : Manages application settings.
+- : Manages AI prompts.
+- : Manages Evolution API instances.
+- : Fetches conversation history.
+- : Sends a manual message from the dashboard.
+- : Tests the connection to the configured Evolution API.
+
+**Critical Info for New Agent**
+- **Redis is Mandatory:** The agent initially made Redis optional but corrected this. Redis is **essential** for maintaining conversation context. The application is configured to connect to a local Redis instance at  by default.
+- **Manual Conversation Memory:** The  library did not handle conversation memory persistence as expected. The agent implemented a manual system where conversation history is explicitly loaded from the PostgreSQL database ( and  tables) for each incoming message. This logic is in  and .
+- **Prompt Limitations:** The user's original prompt ideas included 5-second delays and sending multiple messages in sequence. This is **not possible** with the current architecture. The bot can only send one consolidated reply per incoming message. This must be clearly communicated to the user.
+
+**documents and test reports created in this job**
+- : Product Requirements Document created at the start of the project.
+- : Basic instructions for running the system.
+- : A guide created to help debug Evolution API connection issues.
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User:** The AI responds, but the message doesn't reach the client's WhatsApp. (Issue reported)
+2.  **User:** Provided a very detailed prompt structure from their old N8N setup, including rules for 5-second delays and multi-message sequences. (Feature/Requirement clarification)
+3.  **User:** I THINK the redis address is not working. (Bug report)
+4.  **User:** I think redis has to be mandatory, otherwise the AI cant have a conversation. redis://127.0.0.1:6379". (Correct observation and requirement)
+5.  **User:** The bot only replies with the same initial question. (Bug report - no memory)
+6.  **User:** "its perfect. just missing the function to pull the name in the prompt: *Hello [Owners Name],*". (New feature request - PENDING)
+7.  **User:** `continue` (Request to proceed)
+8.  **User:** "you have to have a field for me to configure on the dashboard, because I have several [instances]". (Requirement clarification)
+9.  **User:** "the instance was missing, dont you think... from evolution. (Correct observation / Bug report)
+10. **User:** which one do I have to select here: (Question about Evolution API webhook event configuration)
+
+**Project Health Check:**
+- **Working:** Core backend and frontend, database integration, settings management, prompt management, Evolution API integration for sending/receiving messages, conversation history persistence, Redis-based session handling.
+- **Broken:** Nothing is fundamentally broken. The last major bug (conversation memory) has been fixed.
+- **Mocked:** No mocked components. All integrations are live.
+
+**3rd Party Integrations**
+- **OpenAI GPT-4o-mini:** Used for generating AI responses. Requires a User-provided API key configured in the dashboard.
+- **Supabase (PostgreSQL):** Used as the primary database. Requires a User-provided connection string.
+- **Evolution API:** Used for WhatsApp integration. Requires User-provided API URL, API Key, and Instance Name(s).
+- **Redis:** Used for session management. Currently hardcoded to  as a default but can be configured in the UI.
+
+**Testing status**
+- **Testing agent used after significant changes:** NO
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** []
+- **Known regressions:** None. The last fix for conversation memory resolved a major regression.
+
+**Credentials to test flow:**
+No hardcoded credentials. The user must configure all API keys and service URLs via the frontend dashboard at  and  after logging in. A default user/password might be needed or implemented.
+
+**What agent forgot to execute**
+The agent acknowledged the user's last request to implement dynamic name substitution in prompts () but did not begin the implementation. This is the main pending task for the next agent.</analysis>
