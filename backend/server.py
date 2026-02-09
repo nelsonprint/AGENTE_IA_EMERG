@@ -111,7 +111,7 @@ async def update_settings(
     settings_update: SettingsUpdate,
     current_user: dict = Depends(get_current_user)
 ):
-    global redis_service, supabase_service
+    global redis_service, supabase_service, evolution_service
     
     existing = await db.settings.find_one({}, {"_id": 0})
     
@@ -146,6 +146,16 @@ async def update_settings(
             supabase_service.connect()
         except Exception as e:
             logger.error(f"Failed to connect to Supabase: {e}")
+    
+    if settings.get("evolution_api_url") and settings.get("evolution_api_key"):
+        try:
+            evolution_service = EvolutionAPIService(
+                settings["evolution_api_url"],
+                settings["evolution_api_key"]
+            )
+            logger.info("Evolution API service initialized")
+        except Exception as e:
+            logger.error(f"Failed to initialize Evolution API: {e}")
     
     return Settings(**settings)
 
