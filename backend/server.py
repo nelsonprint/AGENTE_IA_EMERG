@@ -404,15 +404,25 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     transferred = await db.conversations.count_documents({"status": "transferred"})
     
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-    today_str = today.isoformat()
     
     all_conversations = await db.conversations.find({}, {"_id": 0, "messages": 1}).to_list(10000)
     messages_today = 0
     for conv in all_conversations:
         for msg in conv.get("messages", []):
-            msg_time = datetime.fromisoformat(msg["timestamp"]) if isinstance(msg["timestamp"], str) else msg["timestamp"]
-            if msg_time >= today:
-                messages_today += 1
+            try:
+                if isinstance(msg["timestamp"], str):
+                    msg_time = datetime.fromisoformat(msg["timestamp"])
+                    if msg_time.tzinfo is None:
+                        msg_time = msg_time.replace(tzinfo=timezone.utc)
+                else:
+                    msg_time = msg["timestamp"]
+                    if msg_time.tzinfo is None:
+                        msg_time = msg_time.replace(tzinfo=timezone.utc)
+                
+                if msg_time >= today:
+                    messages_today += 1
+            except:
+                pass
     
     total_users = await db.conversations.count_documents({})
     
