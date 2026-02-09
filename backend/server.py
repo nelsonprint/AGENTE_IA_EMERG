@@ -466,12 +466,38 @@ async def send_message(
         settings = await db.settings.find_one({}, {"_id": 0})
         instance = settings.get("evolution_instance", "default") if settings else "default"
         phone = request.phone_number.replace("@s.whatsapp.net", "")
+        
+        logger.info(f"Sending message to {phone} via instance {instance}")
         success = await evolution_service.send_text_message(instance, phone, request.message)
         
         if not success:
             logger.warning(f"Failed to send message via Evolution API to {phone}")
+            return {"status": "saved", "sent": False, "message": "Message saved but failed to send via WhatsApp"}
+        
+        return {"status": "success", "sent": True, "message": "Message sent"}
+    else:
+        logger.warning("Evolution service not initialized")
+        return {"status": "saved", "sent": False, "message": "Evolution API not configured"}
+
+@api_router.get("/evolution/test")
+async def test_evolution_connection(current_user: dict = Depends(get_current_user)):
+    """Test Evolution API connection"""
+    if not evolution_service:
+        return {"status": "error", "message": "Evolution API not configured"}
     
-    return {"status": "success", "message": "Message sent"}
+    settings = await db.settings.find_one({}, {"_id": 0})
+    if not settings or not settings.get("evolution_api_url"):
+        return {"status": "error", "message": "Evolution API credentials not set"}
+    
+    instance = settings.get("evolution_instance", "default")
+    status = await evolution_service.get_instance_status(instance)
+    
+    return {
+        "status": "success",
+        "instance": instance,
+        "connection": status,
+        "api_url": settings.get("evolution_api_url")
+    }
 
 app.include_router(api_router)
 
