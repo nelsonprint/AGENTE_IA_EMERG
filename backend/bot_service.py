@@ -38,7 +38,9 @@ class BotService:
         
         result = text
         for placeholder in placeholders:
-            result = result.replace(placeholder, customer_name)
+            if placeholder in result:
+                logger.info(f"Replacing placeholder '{placeholder}' with '{customer_name}'")
+                result = result.replace(placeholder, customer_name)
         
         return result
     
