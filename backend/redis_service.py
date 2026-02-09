@@ -19,10 +19,11 @@ class RedisService:
                 decode_responses=True
             )
             await self.client.ping()
-            logger.info("Redis connected successfully")
+            logger.info("✓ Redis connected successfully")
         except Exception as e:
-            logger.error(f"Redis connection error: {e}")
-            raise
+            logger.warning(f"Redis not available: {e}")
+            logger.info("System will work without Redis (no conversation memory cache)")
+            self.client = None
     
     async def disconnect(self):
         """Disconnect from Redis"""
