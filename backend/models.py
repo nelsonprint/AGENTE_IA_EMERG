@@ -99,3 +99,18 @@ class WebhookPayload(BaseModel):
 class SendMessageRequest(BaseModel):
     phone_number: str
     message: str
+
+class EvolutionInstance(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    api_url: str
+    api_key: str
+    instance_name: str = "default"
+    is_default: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class EvolutionInstanceCreate(BaseModel):
+    name: str
+    api_url: str
+    api_key: str
+    instance_name: str = "default"
