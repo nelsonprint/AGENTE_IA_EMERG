@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Settings, MessageSquare, FileText, LogOut, Bot, Webhook } from 'lucide-react';
+import { LayoutDashboard, Settings, MessageSquare, FileText, LogOut, Bot, Webhook, Smartphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 
