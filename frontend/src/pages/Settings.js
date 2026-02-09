@@ -141,6 +141,21 @@ const Settings = () => {
             field="evolution_api_key"
             placeholder="sua-chave-api"
           />
+          <div className="space-y-2">
+            <Label htmlFor="evolution-instance">Nome da Instância</Label>
+            <Input
+              id="evolution-instance"
+              type="text"
+              placeholder="default"
+              value={settings.evolution_instance}
+              onChange={(e) => setSettings({ ...settings, evolution_instance: e.target.value })}
+              className="font-mono text-sm"
+              data-testid="settings-input-evolution_instance"
+            />
+            <p className="text-xs text-muted-foreground">
+              Nome da sua instância na Evolution API (geralmente "default" ou nome personalizado)
+            </p>
+          </div>
         </CardContent>
       </Card>
 
