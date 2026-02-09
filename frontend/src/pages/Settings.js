@@ -174,6 +174,15 @@ const Settings = () => {
               Nome da sua instância na Evolution API (geralmente "default" ou nome personalizado)
             </p>
           </div>
+          <Button
+            variant="outline"
+            onClick={handleTestEvolution}
+            disabled={testing || !settings.evolution_api_url}
+            className="w-full"
+            data-testid="test-evolution-button"
+          >
+            {testing ? 'Testando...' : 'Testar Conexão Evolution API'}
+          </Button>
         </CardContent>
       </Card>
 
