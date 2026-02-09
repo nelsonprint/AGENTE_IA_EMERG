@@ -1,0 +1,149 @@
+{
+  "identity": {
+    "name": "E1 - The Anti-AI Designer",
+    "tone": "Technical, Precise, Futuristic, High-Contrast",
+    "mission": "Create a 'Mission Control' dashboard that feels like a powerful tool, not a generic admin panel."
+  },
+  "typography": {
+    "fonts": {
+      "primary": "Inter",
+      "heading": "Manrope",
+      "mono": "JetBrains Mono"
+    },
+    "weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "bold": 700
+    },
+    "usage": {
+      "headings": "Manrope (Bold/ExtraBold), tight tracking (-0.02em)",
+      "body": "Inter (Regular/Medium), relaxed leading",
+      "code": "JetBrains Mono (Regular), used for logs, API keys, and JSON editors",
+      "labels": "Inter (Medium), uppercase, wide tracking (0.05em)"
+    }
+  },
+  "colors": {
+    "theme": "dark",
+    "palette": {
+      "background": "#09090b",
+      "foreground": "#fafafa",
+      "card": "#18181b",
+      "card_foreground": "#fafafa",
+      "primary": "#10b981",
+      "primary_foreground": "#000000",
+      "secondary": "#27272a",
+      "secondary_foreground": "#fafafa",
+      "muted": "#27272a",
+      "muted_foreground": "#a1a1aa",
+      "accent": "#27272a",
+      "accent_foreground": "#fafafa",
+      "destructive": "#ef4444",
+      "destructive_foreground": "#fafafa",
+      "border": "#27272a",
+      "input": "#27272a",
+      "ring": "#18181b",
+      "ai_accent": "#8b5cf6",
+      "whatsapp_green": "#10b981"
+    },
+    "gradients": {
+      "hero_glow": "radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, rgba(9, 9, 11, 0) 70%)",
+      "active_border": "linear-gradient(90deg, #10b981, #8b5cf6)"
+    }
+  },
+  "layout": {
+    "grid_system": "Bento Grid (Mode B: High Density)",
+    "spacing": {
+      "page_padding": "p-6 md:p-8",
+      "component_gap": "gap-4 md:gap-6",
+      "section_gap": "gap-8"
+    },
+    "sidebar": {
+      "width": "w-64",
+      "collapsed_width": "w-16",
+      "behavior": "Sticky, collapsible, glassmorphism effect"
+    },
+    "container": {
+      "max_width": "max-w-[1600px]",
+      "alignment": "mx-auto"
+    }
+  },
+  "components": {
+    "cards": {
+      "style": "Flat, 1px border (#27272a), no shadow by default",
+      "hover": "border-zinc-700 transition-colors duration-200",
+      "padding": "p-6"
+    },
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md font-medium shadow-[0_0_10px_rgba(16,185,129,0.2)]",
+      "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md font-medium",
+      "ghost": "hover:bg-accent hover:text-accent-foreground rounded-md",
+      "outline": "border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md"
+    },
+    "inputs": {
+      "style": "bg-transparent border-input focus:border-ring focus:ring-1 focus:ring-ring rounded-md h-10",
+      "font": "Inter",
+      "placeholder": "text-muted-foreground"
+    },
+    "badges": {
+      "success": "bg-emerald-500/15 text-emerald-500 border-emerald-500/20 border",
+      "warning": "bg-amber-500/15 text-amber-500 border-amber-500/20 border",
+      "error": "bg-red-500/15 text-red-500 border-red-500/20 border",
+      "info": "bg-blue-500/15 text-blue-500 border-blue-500/20 border"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "sidebar": "backdrop-blur-xl bg-background/80 border-r border-border",
+      "modal": "backdrop-blur-sm bg-background/95 border border-border"
+    },
+    "animations": {
+      "hover_lift": "hover:-translate-y-1 transition-transform duration-200",
+      "pulse": "animate-pulse",
+      "fade_in": "animate-in fade-in zoom-in-95 duration-200"
+    },
+    "micro_interactions": {
+      "active_dot": "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]",
+      "typing_indicator": "Three dots bouncing sequence"
+    }
+  },
+  "pages": {
+    "login": {
+      "layout": "Centered Card on Abstract Background",
+      "background_image": "https://images.unsplash.com/photo-1763445789138-51df1f3ac7b2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMG5ldXJhbCUyMG5ldHdvcmslMjBkYXJrJTIwYmx1ZSUyMHB1cnBsZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcwNjQ5NzA1fDA&ixlib=rb-4.1.0&q=85",
+      "glass_effect": "True"
+    },
+    "dashboard": {
+      "layout": "Grid Layout (Stats Top, Charts Middle, Recent Logs Bottom)",
+      "widgets": ["Active Connections", "Messages Today", "AI Token Usage", "Error Rate"]
+    },
+    "chat_monitor": {
+      "layout": "Three-pane layout: List (Left), Chat Window (Center), Details/Actions (Right)",
+      "style": "Dense, like Slack or Discord"
+    },
+    "configuration": {
+      "layout": "Tabs (General, API Keys, Prompts, Team)",
+      "style": "Form-focused, clear validation"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure text is APCA compliant (4.5:1 minimum for normal text)",
+    "focus_states": "Visible ring-2 ring-primary offset-2 offset-background",
+    "motion": "Respect prefers-reduced-motion"
+  },
+  "universal_guidelines": {
+    "no_gradients_text": "Do not use gradients on small text.",
+    "no_ai_emojis": "Do not use generic AI emojis (🤖, 🧠) in UI.",
+    "real_time_feel": "Use subtle layout animations for incoming data.",
+    "testing": "All interactive elements must have data-testid attributes."
+  },
+  "instructions_to_main_agent": "Use the provided color palette strictly. Implement the sidebar as a separate component. Use Recharts for data visualization (install if needed). Ensure all API keys are masked by default with a toggle to show. Use 'sonner' for notifications.",
+  "required_packages": [
+    "lucide-react",
+    "recharts",
+    "framer-motion",
+    "clsx",
+    "tailwind-merge",
+    "sonner"
+  ]
+}
