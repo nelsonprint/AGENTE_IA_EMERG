@@ -55,6 +55,23 @@ const Settings = () => {
     }
   };
 
+  const handleTestEvolution = async () => {
+    setTesting(true);
+    try {
+      const response = await axios.get(`${API}/evolution/test`, getAuthHeader());
+      if (response.data.status === 'success') {
+        toast.success(`Conexão OK! Instância: ${response.data.instance}`);
+      } else {
+        toast.error(response.data.message || 'Erro ao testar conexão');
+      }
+    } catch (error) {
+      toast.error('Erro ao testar Evolution API');
+      console.error('Error testing evolution:', error);
+    } finally {
+      setTesting(false);
+    }
+  };
+
   const toggleShowKey = (field) => {
     setShowKeys(prev => ({ ...prev, [field]: !prev[field] }));
   };
