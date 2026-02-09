@@ -384,6 +384,11 @@ async def webhook_handler(webhook_id: str, payload: dict):
             }
         )
         
+        # Send response back via Evolution API
+        if evolution_service:
+            instance = settings.get("evolution_instance", "default")
+            await evolution_service.send_text_message(instance, phone_number, ai_response)
+        
         return {
             "status": "success",
             "response": ai_response
