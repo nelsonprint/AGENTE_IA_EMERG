@@ -12,7 +12,8 @@ from models import (
     AdminUserCreate, AdminUserLogin, TokenResponse,
     Settings, SettingsUpdate,
     BotPrompt, BotPromptCreate, BotPromptUpdate,
-    Conversation, Message, WebhookPayload, SendMessageRequest
+    Conversation, Message, WebhookPayload, SendMessageRequest,
+    EvolutionInstance, EvolutionInstanceCreate
 )
 from auth import hash_password, verify_password, create_access_token, get_current_user
 from bot_service import BotService
