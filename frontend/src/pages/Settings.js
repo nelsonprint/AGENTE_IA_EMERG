@@ -19,6 +19,7 @@ const Settings = () => {
     openai_api_key: '',
     evolution_api_url: '',
     evolution_api_key: '',
+    evolution_instance: 'default',
     supabase_url: '',
     supabase_key: '',
     redis_url: '',
