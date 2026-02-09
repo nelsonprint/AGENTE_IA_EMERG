@@ -387,11 +387,22 @@ async def webhook_handler(webhook_id: str, payload: dict):
         # Send response back via Evolution API
         if evolution_service:
             instance = settings.get("evolution_instance", "default")
-            await evolution_service.send_text_message(instance, phone_number, ai_response)
+            logger.info(f"Attempting to send message to {phone_number} via instance {instance}")
+            logger.info(f"Message content: {ai_response[:100]}...")
+            
+            success = await evolution_service.send_text_message(instance, phone_number, ai_response)
+            
+            if success:
+                logger.info(f"✓ Message sent successfully to {phone_number}")
+            else:
+                logger.error(f"✗ Failed to send message to {phone_number}")
+        else:
+            logger.warning("Evolution service not initialized - message not sent to WhatsApp")
         
         return {
             "status": "success",
-            "response": ai_response
+            "response": ai_response,
+            "sent_to_whatsapp": evolution_service is not None
         }
         
     except Exception as e:
