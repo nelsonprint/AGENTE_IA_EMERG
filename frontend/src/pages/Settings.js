@@ -209,21 +209,26 @@ const Settings = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Redis</CardTitle>
+          <CardTitle>Redis (OPCIONAL)</CardTitle>
           <CardDescription>
-            Cache para memória de conversa e sessões
+            Cache para memória de conversa - Sistema funciona perfeitamente sem Redis
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
+            <p className="text-xs text-blue-400">
+              💡 <strong>Redis é opcional!</strong> Deixe vazio se não precisar. O sistema funciona normalmente sem cache.
+            </p>
+          </div>
           <SettingField
-            label="Redis URL"
+            label="Redis URL (opcional)"
             field="redis_url"
             placeholder="redis://localhost:6379"
           />
           <SettingField
             label="Redis Password (opcional)"
             field="redis_password"
-            placeholder="sua-senha"
+            placeholder="deixe vazio se não tiver senha"
           />
         </CardContent>
       </Card>
