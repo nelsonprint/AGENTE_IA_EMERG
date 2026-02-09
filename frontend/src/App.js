@@ -8,6 +8,7 @@ import Conversations from './pages/Conversations';
 import Prompts from './pages/Prompts';
 import Settings from './pages/Settings';
 import WebhookConfig from './pages/WebhookConfig';
+import EvolutionInstances from './pages/EvolutionInstances';
 import Sidebar from './components/Sidebar';
 import './App.css';
 
