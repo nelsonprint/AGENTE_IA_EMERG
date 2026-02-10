@@ -69,6 +69,24 @@ const Conversations = () => {
     }
   };
 
+  const handleDelete = async (conversationId, e) => {
+    e.stopPropagation(); // Prevent card click
+    if (!window.confirm('Tem certeza que deseja excluir esta conversa? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    try {
+      await axios.delete(`${API}/conversations/${conversationId}`, getAuthHeader());
+      toast.success('Conversa excluída');
+      if (selectedConversation?.id === conversationId) {
+        setSelectedConversation(null);
+      }
+      fetchConversations();
+    } catch (error) {
+      toast.error('Erro ao excluir conversa');
+      console.error('Error deleting conversation:', error);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!message.trim() || !selectedConversation) return;
     
