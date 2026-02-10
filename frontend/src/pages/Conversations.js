@@ -164,38 +164,40 @@ const Conversations = () => {
                 {conversations.map((conv) => (
                   <Card
                     key={conv.id}
-                    className={`cursor-pointer hover:border-zinc-700 transition-colors relative group ${
+                    className={`cursor-pointer hover:border-zinc-700 transition-colors relative ${
                       selectedConversation?.id === conv.id ? 'border-primary' : ''
                     }`}
                     onClick={() => setSelectedConversation(conv)}
                     data-testid={`conversation-item-${conv.id}`}
                   >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => handleDelete(conv.id, e)}
-                      className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg"
-                      data-testid={`delete-conversation-${conv.id}`}
-                      title="Excluir conversa"
-                    >
-                      <X className="w-4 h-4 text-white" />
-                    </button>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                             <User className="w-5 h-5 text-primary" />
                           </div>
-                          <div>
+                          <div className="min-w-0 flex-1">
                             <p className="font-semibold">{conv.user_name}</p>
                             <p className="text-xs text-muted-foreground">{conv.phone_number}</p>
                           </div>
                         </div>
-                        <Badge className={getStatusColor(conv.status)}>
-                          {getStatusLabel(conv.status)}
-                        </Badge>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <Badge className={getStatusColor(conv.status)}>
+                            {getStatusLabel(conv.status)}
+                          </Badge>
+                          {/* Delete Button */}
+                          <button
+                            onClick={(e) => handleDelete(conv.id, e)}
+                            className="w-7 h-7 rounded-full bg-red-500/20 hover:bg-red-500 flex items-center justify-center transition-colors"
+                            data-testid={`delete-conversation-${conv.id}`}
+                            title="Excluir conversa"
+                          >
+                            <X className="w-4 h-4 text-red-500 hover:text-white" />
+                          </button>
+                        </div>
                       </div>
                       {conv.messages.length > 0 && (
-                        <p className="text-sm text-muted-foreground truncate">
+                        <p className="text-sm text-muted-foreground break-words">
                           {conv.messages[conv.messages.length - 1].content}
                         </p>
                       )}
