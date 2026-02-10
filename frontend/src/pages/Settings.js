@@ -26,8 +26,10 @@ const Settings = () => {
     supabase_key: '',
     redis_url: '',
     redis_password: '',
-    notification_whatsapp: ''
+    notification_whatsapp: '',
+    transfer_keywords: []
   });
+  const [newKeyword, setNewKeyword] = useState('');
 
   useEffect(() => {
     fetchSettings();
