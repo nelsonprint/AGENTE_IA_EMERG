@@ -424,56 +424,37 @@ async def webhook_handler(webhook_id: str, payload: dict):
             }
         )
         
-        if conversation.get("transferred_to_human") or should_transfer:
-            if should_transfer and not conversation.get("transferred_to_human"):
-                await db.conversations.update_one(
-                    {"id": conversation["id"]},
-                    {"$set": {"transferred_to_human": True, "status": "transferred"}}
-                )
+        # If keyword detected, send notification but continue conversation normally
+        if should_transfer and not conversation.get("notified_owner"):
+            # Mark that we already notified for this conversation (avoid spam)
+            await db.conversations.update_one(
+                {"id": conversation["id"]},
+                {"$set": {"notified_owner": True}}
+            )
+            
+            # Send notification to owner's WhatsApp
+            notification_phone = settings.get("notification_whatsapp")
+            if notification_phone and default_instance:
+                clean_notification_phone = notification_phone.replace("+", "").replace("-", "").replace(" ", "").replace("(", "").replace(")", "")
                 
-                transfer_msg = Message(
-                    conversation_id=conversation["id"],
-                    sender="bot",
-                    content="Um momento, vou transferir você para um atendente humano."
-                ).model_dump()
-                transfer_msg["timestamp"] = transfer_msg["timestamp"].isoformat()
-                
-                await db.conversations.update_one(
-                    {"id": conversation["id"]},
-                    {"$push": {"messages": transfer_msg}}
-                )
-                
-                # Send notification to owner's WhatsApp
-                notification_phone = settings.get("notification_whatsapp")
-                if notification_phone and default_instance:
-                    # Clean notification phone number
-                    clean_notification_phone = notification_phone.replace("+", "").replace("-", "").replace(" ", "").replace("(", "").replace(")", "")
-                    
-                    notification_message = f"""🔔 NOVO ATENDIMENTO SOLICITADO
+                notification_message = f"""🔔 NOVO ATENDIMENTO SOLICITADO
 
 Cliente: {user_name}
 https://wa.me/+{phone_number}
 Última mensagem: "{message_content}"
 """
-                    
-                    instance_service = EvolutionAPIService(
-                        default_instance["api_url"],
-                        default_instance["api_key"]
-                    )
-                    instance_name = default_instance["instance_name"]
-                    
-                    logger.info(f"Sending transfer notification to {clean_notification_phone}")
-                    await instance_service.send_text_message(instance_name, clean_notification_phone, notification_message)
                 
-                # Send transfer message to client
-                if default_instance:
-                    instance_service = EvolutionAPIService(
-                        default_instance["api_url"],
-                        default_instance["api_key"]
-                    )
-                    instance_name = default_instance["instance_name"]
-                    await instance_service.send_text_message(instance_name, phone_number, "Um momento, vou transferir você para um atendente humano.")
-            
+                instance_service = EvolutionAPIService(
+                    default_instance["api_url"],
+                    default_instance["api_key"]
+                )
+                instance_name = default_instance["instance_name"]
+                
+                logger.info(f"Sending notification to {clean_notification_phone} - conversation continues normally")
+                await instance_service.send_text_message(instance_name, clean_notification_phone, notification_message)
+        
+        # Handle manual transfer request (when user explicitly asks for human)
+        if conversation.get("transferred_to_human"):
             return {"status": "transferred_to_human"}
         
         # Get conversation history for context
