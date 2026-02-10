@@ -315,6 +315,28 @@ async def close_conversation(
     
     return {"message": "Conversation closed"}
 
+@api_router.delete("/conversations/{conversation_id}")
+async def delete_conversation(
+    conversation_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    global redis_service
+    
+    conversation = await db.conversations.find_one({"id": conversation_id}, {"_id": 0})
+    
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    # Delete conversation from database
+    await db.conversations.delete_one({"id": conversation_id})
+    
+    # Clear from Redis if available
+    if redis_service:
+        await redis_service.delete_conversation(conversation["phone_number"])
+    
+    logger.info(f"Conversation {conversation_id} deleted by user")
+    return {"message": "Conversation deleted successfully"}
+
 @api_router.post("/webhook/{webhook_id}")
 async def webhook_handler(webhook_id: str, payload: dict):
     try:
