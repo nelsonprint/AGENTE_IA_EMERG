@@ -144,6 +144,34 @@ const Settings = () => {
 
       <Card>
         <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span>🔔</span> Notificações de Transferência
+          </CardTitle>
+          <CardDescription>
+            Receba uma mensagem no seu WhatsApp quando um cliente solicitar atendimento humano
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="notification_whatsapp">Seu WhatsApp para Notificações</Label>
+            <Input
+              id="notification_whatsapp"
+              type="text"
+              placeholder="5511999999999"
+              value={settings.notification_whatsapp || ''}
+              onChange={(e) => setSettings({ ...settings, notification_whatsapp: e.target.value })}
+              className="font-mono text-sm"
+              data-testid="settings-input-notification_whatsapp"
+            />
+            <p className="text-xs text-muted-foreground">
+              Digite seu número com código do país (ex: 5511999999999). Você receberá notificações quando um cliente pedir para falar com o dono, gerente, comercial, etc.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Evolution API (WhatsApp)</CardTitle>
           <CardDescription>
             Credenciais para enviar e receber mensagens do WhatsApp
