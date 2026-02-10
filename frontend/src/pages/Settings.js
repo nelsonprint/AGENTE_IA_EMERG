@@ -197,6 +197,63 @@ const Settings = () => {
 
       <Card>
         <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span>🔑</span> Palavras-chave de Transferência
+          </CardTitle>
+          <CardDescription>
+            Quando o cliente usar uma dessas palavras, a conversa será transferida e você receberá uma notificação
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Digite uma palavra-chave..."
+              value={newKeyword}
+              onChange={(e) => setNewKeyword(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
+              className="flex-1"
+              data-testid="new-keyword-input"
+            />
+            <Button onClick={addKeyword} variant="outline" className="gap-2" data-testid="add-keyword-button">
+              <Plus className="w-4 h-4" />
+              Adicionar
+            </Button>
+          </div>
+          
+          <div className="flex flex-wrap gap-2 min-h-[60px] p-3 bg-secondary/30 rounded-lg">
+            {(!settings.transfer_keywords || settings.transfer_keywords.length === 0) ? (
+              <p className="text-sm text-muted-foreground">
+                Nenhuma palavra-chave cadastrada. Serão usadas as palavras padrão do sistema.
+              </p>
+            ) : (
+              settings.transfer_keywords.map((keyword, index) => (
+                <Badge 
+                  key={index} 
+                  variant="secondary" 
+                  className="px-3 py-1.5 text-sm flex items-center gap-2 bg-primary/20"
+                >
+                  {keyword}
+                  <button
+                    onClick={() => removeKeyword(keyword)}
+                    className="hover:text-red-500 transition-colors"
+                    data-testid={`remove-keyword-${index}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))
+            )}
+          </div>
+          
+          <p className="text-xs text-muted-foreground">
+            Exemplos: "falar com gerente", "quero falar com dono", "atendimento humano", "tenho interesse", "como comprar"
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Evolution API (WhatsApp)</CardTitle>
           <CardDescription>
             Credenciais para enviar e receber mensagens do WhatsApp
