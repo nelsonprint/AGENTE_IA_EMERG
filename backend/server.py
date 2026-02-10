@@ -400,6 +400,14 @@ async def webhook_handler(webhook_id: str, payload: dict):
             conversation["started_at"] = conversation["started_at"].isoformat()
             conversation["last_message_at"] = conversation["last_message_at"].isoformat()
             await db.conversations.insert_one(conversation)
+        else:
+            # Update user_name in conversation if we have a better name now
+            if user_name != "Unknown" and conversation.get("user_name") == "Unknown":
+                await db.conversations.update_one(
+                    {"id": conversation["id"]},
+                    {"$set": {"user_name": user_name}}
+                )
+                conversation["user_name"] = user_name
         
         user_message = Message(
             conversation_id=conversation["id"],
