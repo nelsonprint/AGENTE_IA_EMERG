@@ -350,11 +350,27 @@ async def webhook_handler(webhook_id: str, payload: dict):
             return {"status": "ignored", "reason": "Message from bot"}
         
         phone_number = key.get("remoteJid", "").split("@")[0]
-        user_name = payload.get("pushName", "Unknown")
+        push_name = payload.get("pushName", "Unknown")
         message_content = message_data.get("conversation", "")
         
         if not message_content or not phone_number:
             return {"status": "ignored", "reason": "No message content or phone"}
+        
+        # Check if we already have a conversation with this number to get saved name
+        existing_conversation = await db.conversations.find_one(
+            {"phone_number": phone_number}, 
+            {"_id": 0, "user_name": 1}
+        )
+        
+        # Use saved name if available and not "Unknown", otherwise use pushName
+        if existing_conversation and existing_conversation.get("user_name") and existing_conversation.get("user_name") != "Unknown":
+            user_name = existing_conversation["user_name"]
+        else:
+            user_name = push_name
+            
+        # Update user_name if pushName is better (not Unknown and different)
+        if push_name and push_name != "Unknown" and push_name != user_name:
+            user_name = push_name
         
         settings = await db.settings.find_one({}, {"_id": 0})
         if not settings or not settings.get("openai_api_key"):
