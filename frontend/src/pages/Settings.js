@@ -80,6 +80,28 @@ const Settings = () => {
     setShowKeys(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
+  const addKeyword = () => {
+    if (!newKeyword.trim()) return;
+    const currentKeywords = settings.transfer_keywords || [];
+    if (currentKeywords.includes(newKeyword.trim().toLowerCase())) {
+      toast.error('Palavra-chave já existe');
+      return;
+    }
+    setSettings({
+      ...settings,
+      transfer_keywords: [...currentKeywords, newKeyword.trim().toLowerCase()]
+    });
+    setNewKeyword('');
+  };
+
+  const removeKeyword = (keyword) => {
+    const currentKeywords = settings.transfer_keywords || [];
+    setSettings({
+      ...settings,
+      transfer_keywords: currentKeywords.filter(k => k !== keyword)
+    });
+  };
+
   const maskValue = (value) => {
     if (!value) return '';
     return '•'.repeat(Math.min(value.length, 20));
