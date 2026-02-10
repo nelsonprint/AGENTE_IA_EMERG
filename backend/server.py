@@ -368,7 +368,9 @@ async def webhook_handler(webhook_id: str, payload: dict):
         default_instance = await db.evolution_instances.find_one({"is_default": True}, {"_id": 0})
         
         bot_service = BotService(settings["openai_api_key"], system_prompt)
-        should_transfer = bot_service.should_transfer_to_human(message_content)
+        # Get custom transfer keywords from settings
+        custom_keywords = settings.get("transfer_keywords")
+        should_transfer = bot_service.should_transfer_to_human(message_content, custom_keywords)
         
         conversation = await db.conversations.find_one({"phone_number": phone_number, "status": {"$ne": "closed"}}, {"_id": 0})
         
