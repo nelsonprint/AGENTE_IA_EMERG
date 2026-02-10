@@ -34,6 +34,7 @@ class Settings(BaseModel):
     supabase_key: Optional[str] = None
     redis_url: Optional[str] = None
     redis_password: Optional[str] = None
+    notification_whatsapp: Optional[str] = None  # WhatsApp para receber notificações de transferência
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SettingsUpdate(BaseModel):
@@ -45,6 +46,7 @@ class SettingsUpdate(BaseModel):
     supabase_key: Optional[str] = None
     redis_url: Optional[str] = None
     redis_password: Optional[str] = None
+    notification_whatsapp: Optional[str] = None
 
 class BotPrompt(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

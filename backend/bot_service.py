@@ -77,14 +77,33 @@ class BotService:
             return "Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente."
     
     def should_transfer_to_human(self, message: str) -> bool:
-        """Simple keyword detection for human transfer"""
+        """Keyword detection for human transfer"""
         transfer_keywords = [
             "falar com atendente",
             "atendente humano",
             "falar com alguém",
             "preciso de ajuda humana",
             "transferir",
-            "humano"
+            "humano",
+            "falar com o dono",
+            "falar com dono",
+            "falar com gerente",
+            "falar com o gerente",
+            "falar com comercial",
+            "falar com o comercial",
+            "falar com responsável",
+            "falar com o responsável",
+            "falar com supervisor",
+            "falar com o supervisor",
+            "falar com vendedor",
+            "falar com o vendedor",
+            "quero falar com",
+            "passar para",
+            "me transfere",
+            "atendimento humano",
+            "pessoa real",
+            "falar com pessoa",
+            "falar com uma pessoa"
         ]
         message_lower = message.lower()
         return any(keyword in message_lower for keyword in transfer_keywords)
