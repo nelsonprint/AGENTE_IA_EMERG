@@ -76,9 +76,10 @@ class BotService:
             logger.error(f"Error generating AI response: {e}")
             return "Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente."
     
-    def should_transfer_to_human(self, message: str) -> bool:
+    def should_transfer_to_human(self, message: str, custom_keywords: List[str] = None) -> bool:
         """Keyword detection for human transfer"""
-        transfer_keywords = [
+        # Default keywords if none provided
+        default_keywords = [
             "falar com atendente",
             "atendente humano",
             "falar com alguém",
@@ -105,5 +106,9 @@ class BotService:
             "falar com pessoa",
             "falar com uma pessoa"
         ]
+        
+        # Use custom keywords if provided, otherwise use defaults
+        keywords = custom_keywords if custom_keywords and len(custom_keywords) > 0 else default_keywords
+        
         message_lower = message.lower()
-        return any(keyword in message_lower for keyword in transfer_keywords)
+        return any(keyword.lower() in message_lower for keyword in keywords)
