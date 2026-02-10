@@ -364,6 +364,9 @@ async def webhook_handler(webhook_id: str, payload: dict):
         active_prompt = await db.bot_prompts.find_one({"is_active": True}, {"_id": 0})
         system_prompt = active_prompt["system_prompt"] if active_prompt else "Você é um assistente virtual útil."
         
+        # Get default Evolution instance early (needed for transfer notifications)
+        default_instance = await db.evolution_instances.find_one({"is_default": True}, {"_id": 0})
+        
         bot_service = BotService(settings["openai_api_key"], system_prompt)
         should_transfer = bot_service.should_transfer_to_human(message_content)
         
