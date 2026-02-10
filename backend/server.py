@@ -489,9 +489,11 @@ https://wa.me/+{phone_number}
             }
         )
         
-        # Send response back via Evolution API
-        default_instance = await db.evolution_instances.find_one({"is_default": True}, {"_id": 0})
+        # Add 3 second delay before sending response (more natural conversation flow)
+        import asyncio
+        await asyncio.sleep(3)
         
+        # Send response back via Evolution API
         if default_instance:
             instance_service = EvolutionAPIService(
                 default_instance["api_url"],
