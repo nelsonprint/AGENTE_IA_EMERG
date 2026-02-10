@@ -24,7 +24,8 @@ const Settings = () => {
     supabase_url: '',
     supabase_key: '',
     redis_url: '',
-    redis_password: ''
+    redis_password: '',
+    notification_whatsapp: ''
   });
 
   useEffect(() => {
