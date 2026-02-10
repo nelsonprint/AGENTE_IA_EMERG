@@ -164,12 +164,21 @@ const Conversations = () => {
                 {conversations.map((conv) => (
                   <Card
                     key={conv.id}
-                    className={`cursor-pointer hover:border-zinc-700 transition-colors ${
+                    className={`cursor-pointer hover:border-zinc-700 transition-colors relative group ${
                       selectedConversation?.id === conv.id ? 'border-primary' : ''
                     }`}
                     onClick={() => setSelectedConversation(conv)}
                     data-testid={`conversation-item-${conv.id}`}
                   >
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => handleDelete(conv.id, e)}
+                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500/20 hover:bg-red-500/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                      data-testid={`delete-conversation-${conv.id}`}
+                      title="Excluir conversa"
+                    >
+                      <X className="w-3 h-3 text-red-500" />
+                    </button>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-2">
