@@ -173,11 +173,11 @@ const Conversations = () => {
                     {/* Delete Button */}
                     <button
                       onClick={(e) => handleDelete(conv.id, e)}
-                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500/20 hover:bg-red-500/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                      className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg"
                       data-testid={`delete-conversation-${conv.id}`}
                       title="Excluir conversa"
                     >
-                      <X className="w-3 h-3 text-red-500" />
+                      <X className="w-4 h-4 text-white" />
                     </button>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-2">
