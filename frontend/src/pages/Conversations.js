@@ -316,10 +316,12 @@ const Conversations = () => {
                             })}
                           </span>
                         </div>
-                        <p className="text-sm">{msg.content}</p>
+                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                       </div>
                     </div>
                   ))}
+                  {/* Invisible element to scroll to */}
+                  <div ref={messagesEndRef} />
                 </div>
               </ScrollArea>
 
