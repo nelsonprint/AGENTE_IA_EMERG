@@ -43,7 +43,7 @@ class Settings(BaseModel):
     redis_password: Optional[str] = None
     notification_whatsapp: Optional[str] = None  # WhatsApp para receber notificações de transferência
     transfer_keywords: Optional[List[str]] = None  # Palavras-chave que ativam transferência
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=get_brazil_time)
 
 class SettingsUpdate(BaseModel):
     openai_api_key: Optional[str] = None
@@ -62,8 +62,8 @@ class BotPrompt(BaseModel):
     name: str
     system_prompt: str
     is_active: bool = True
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=get_brazil_time)
+    updated_at: datetime = Field(default_factory=get_brazil_time)
 
 class BotPromptCreate(BaseModel):
     name: str
@@ -79,8 +79,8 @@ class WhatsAppUser(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     phone_number: str
     name: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    last_interaction: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=get_brazil_time)
+    last_interaction: datetime = Field(default_factory=get_brazil_time)
 
 class Message(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -88,7 +88,7 @@ class Message(BaseModel):
     sender: str  # 'user' or 'bot'
     content: str
     message_type: str = "text"
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=get_brazil_time)
 
 class Conversation(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -96,8 +96,8 @@ class Conversation(BaseModel):
     phone_number: str
     user_name: str
     status: str = "active"  # active, transferred, closed
-    started_at: datetime = Field(default_factory=datetime.utcnow)
-    last_message_at: datetime = Field(default_factory=datetime.utcnow)
+    started_at: datetime = Field(default_factory=get_brazil_time)
+    last_message_at: datetime = Field(default_factory=get_brazil_time)
     messages: List[Message] = []
     transferred_to_human: bool = False
 
@@ -118,7 +118,7 @@ class EvolutionInstance(BaseModel):
     api_key: str
     instance_name: str = "default"
     is_default: bool = False
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=get_brazil_time)
 
 class EvolutionInstanceCreate(BaseModel):
     name: str
