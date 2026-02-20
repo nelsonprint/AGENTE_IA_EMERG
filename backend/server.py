@@ -94,7 +94,7 @@ async def register(user_data: AdminUserCreate):
         "username": user_data.username,
         "email": user_data.email,
         "hashed_password": hashed_pwd,
-        "created_at": datetime.now(timezone.utc).isoformat()
+        "created_at": get_brazil_time().isoformat()
     }
     
     await db.admin_users.insert_one(user_doc)
@@ -150,14 +150,14 @@ async def update_settings(
     existing = await db.settings.find_one({}, {"_id": 0})
     
     update_data = settings_update.model_dump(exclude_unset=True)
-    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_data["updated_at"] = get_brazil_time().isoformat()
     
     if existing:
         await db.settings.update_one({}, {"$set": update_data})
         settings = await db.settings.find_one({}, {"_id": 0})
     else:
         settings_doc = Settings(**update_data).model_dump()
-        settings_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+        settings_doc["updated_at"] = get_brazil_time().isoformat()
         await db.settings.insert_one(settings_doc)
         settings = settings_doc
     
@@ -231,7 +231,7 @@ async def update_prompt(
         raise HTTPException(status_code=404, detail="Prompt not found")
     
     update_data = prompt_update.model_dump(exclude_unset=True)
-    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_data["updated_at"] = get_brazil_time().isoformat()
     
     await db.bot_prompts.update_one({"id": prompt_id}, {"$set": update_data})
     
@@ -459,7 +459,7 @@ async def webhook_handler(webhook_id: str, payload: dict):
             {"id": conversation["id"]},
             {
                 "$push": {"messages": user_message},
-                "$set": {"last_message_at": datetime.now(timezone.utc).isoformat()}
+                "$set": {"last_message_at": get_brazil_time().isoformat()}
             }
         )
         
@@ -524,7 +524,7 @@ https://wa.me/+{phone_number}
             {"id": conversation["id"]},
             {
                 "$push": {"messages": bot_message},
-                "$set": {"last_message_at": datetime.now(timezone.utc).isoformat()}
+                "$set": {"last_message_at": get_brazil_time().isoformat()}
             }
         )
         
@@ -567,7 +567,7 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     active_conversations = await db.conversations.count_documents({"status": "active"})
     transferred = await db.conversations.count_documents({"status": "transferred"})
     
-    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today = get_brazil_time().replace(hour=0, minute=0, second=0, microsecond=0)
     
     all_conversations = await db.conversations.find({}, {"_id": 0, "messages": 1}).to_list(10000)
     messages_today = 0
@@ -621,7 +621,7 @@ async def send_message(
         {"id": conversation["id"]},
         {
             "$push": {"messages": bot_message},
-            "$set": {"last_message_at": datetime.now(timezone.utc).isoformat()}
+            "$set": {"last_message_at": get_brazil_time().isoformat()}
         }
     )
     
