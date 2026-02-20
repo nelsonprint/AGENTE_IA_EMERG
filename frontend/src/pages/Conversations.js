@@ -327,7 +327,7 @@ const Conversations = () => {
 
               {/* Message Input (only for transferred conversations) */}
               {selectedConversation.transferred_to_human && selectedConversation.status !== 'closed' && (
-                <div className="p-4 border-t border-border relative z-50 bg-background">
+                <div className="p-4 pb-20 border-t border-border relative z-50 bg-background">
                   <div className="flex gap-2">
                     <Input
                       placeholder="Digite sua mensagem..."
