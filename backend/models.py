@@ -2,13 +2,20 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import uuid
+import pytz
+
+# Fuso horário de São Paulo
+SAO_PAULO_TZ = pytz.timezone('America/Sao_Paulo')
+
+def get_brazil_time():
+    return datetime.now(SAO_PAULO_TZ)
 
 class AdminUser(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     username: str
     email: str
     hashed_password: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=get_brazil_time)
 
 class AdminUserCreate(BaseModel):
     username: str
