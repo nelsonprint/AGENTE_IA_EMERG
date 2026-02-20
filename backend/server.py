@@ -5,8 +5,22 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List, Optional
+import pytz
+
+# Fuso horário de São Paulo/Brasil
+SAO_PAULO_TZ = pytz.timezone('America/Sao_Paulo')
+
+def get_brazil_time():
+    """Retorna a hora atual no fuso horário de São Paulo"""
+    return datetime.now(SAO_PAULO_TZ)
+
+def utc_to_brazil(utc_dt):
+    """Converte UTC para horário de São Paulo"""
+    if utc_dt.tzinfo is None:
+        utc_dt = utc_dt.replace(tzinfo=timezone.utc)
+    return utc_dt.astimezone(SAO_PAULO_TZ)
 
 from models import (
     AdminUserCreate, AdminUserLogin, TokenResponse,
