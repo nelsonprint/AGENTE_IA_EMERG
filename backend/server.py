@@ -356,6 +356,31 @@ async def webhook_handler(webhook_id: str, payload: dict):
         if not message_content or not phone_number:
             return {"status": "ignored", "reason": "No message content or phone"}
         
+        # Detect and ignore bot/automated messages
+        bot_indicators = [
+            "assistente virtual",
+            "pré-atendimento",
+            "agradece seu contato",
+            "em breve um consultor",
+            "em breve entraremos em contato",
+            "atendimento automático",
+            "mensagem automática",
+            "sou um bot",
+            "sou uma ia",
+            "inteligência artificial",
+            "chat.whatsapp.com/",
+            "ATENÇÃO",
+            "VAGAS",
+            "ENTREM NO GRUPO",
+            "GRUPO PRINCIPAL"
+        ]
+        
+        message_lower = message_content.lower()
+        for indicator in bot_indicators:
+            if indicator.lower() in message_lower:
+                logger.info(f"Ignoring bot/spam message: {message_content[:50]}...")
+                return {"status": "ignored", "reason": "bot_or_spam_detected"}
+        
         # Check if we already have a conversation with this number to get saved name
         existing_conversation = await db.conversations.find_one(
             {"phone_number": phone_number}, 
