@@ -87,3 +87,9 @@ h1, h2, h3, h4, h5, h6 {
         border-bottom-color: inherit;
     }
 }
+
+/* Hide Emergent badge on conversations page to prevent overlap with send button */
+[data-testid="conversations-page"] ~ div[style*="position: fixed"],
+body > div[style*="position: fixed"][style*="bottom"] {
+    z-index: 1 !important;
+}
