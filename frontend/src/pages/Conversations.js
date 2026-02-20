@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -19,6 +19,11 @@ const Conversations = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [message, setMessage] = useState('');
+  const messagesEndRef = useRef(null);
+  const selectedConversationRef = useRef(null);
+
+  // Keep track of selected conversation ID to prevent losing focus
+  const selectedIdRef = useRef(null);
 
   useEffect(() => {
     fetchConversations();
@@ -26,15 +31,35 @@ const Conversations = () => {
     return () => clearInterval(interval);
   }, [filter]);
 
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedConversation?.messages]);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const fetchConversations = async () => {
     try {
       const url = filter === 'all' ? `${API}/conversations` : `${API}/conversations?status=${filter}`;
       const response = await axios.get(url, getAuthHeader());
-      setConversations(response.data);
       
-      // Refresh selected conversation if open
-      if (selectedConversation) {
-        const updated = response.data.find(c => c.id === selectedConversation.id);
+      // Sort conversations by last message time (newest first)
+      const sortedConversations = response.data.sort((a, b) => {
+        const timeA = new Date(a.last_message_at || a.started_at);
+        const timeB = new Date(b.last_message_at || b.started_at);
+        return timeB - timeA;
+      });
+      
+      setConversations(sortedConversations);
+      
+      // Update selected conversation without losing focus
+      // Only update if we have a selected conversation
+      if (selectedIdRef.current) {
+        const updated = sortedConversations.find(c => c.id === selectedIdRef.current);
         if (updated) {
           setSelectedConversation(updated);
         }
@@ -44,6 +69,11 @@ const Conversations = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectConversation = (conv) => {
+    selectedIdRef.current = conv.id;
+    setSelectedConversation(conv);
   };
 
   const handleTransfer = async (conversationId) => {
