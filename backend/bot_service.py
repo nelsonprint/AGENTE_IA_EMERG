@@ -47,23 +47,31 @@ class BotService:
     async def generate_response(self, session_id: str, user_message: str, conversation_history: List[Dict] = None, customer_name: str = None) -> str:
         """Generate AI response using OpenAI with conversation history"""
         try:
-            # Build context from history
+            # Replace name placeholders in system prompt
+            full_prompt = self._replace_name_placeholders(self.system_message, customer_name)
+            
+            # Build context from history - format it clearly for the AI
             context = ""
             if conversation_history and len(conversation_history) > 0:
-                context = "\n\nHistórico da conversa:\n"
-                for msg in conversation_history[-10:]:  # Last 10 messages
-                    role = "Cliente" if msg["sender"] == "user" else "Você"
+                context = "\n\n========================================\nHISTÓRICO DA CONVERSA ATUAL (use para manter contexto e NÃO repetir perguntas já feitas):\n========================================\n"
+                for msg in conversation_history[-15:]:  # Last 15 messages for better context
+                    role = "CLIENTE" if msg["sender"] == "user" else "VOCÊ (Eduardo)"
                     context += f"{role}: {msg['content']}\n"
+                context += "========================================\n"
+                context += "\nIMPORTANTE: Baseado no histórico acima, continue a conversa de forma natural. NÃO repita perguntas que você já fez. Se o cliente já respondeu algo, siga para o próximo passo do fluxo.\n"
             
-            # Create prompt with history and replace name placeholders
-            full_prompt = self._replace_name_placeholders(self.system_message, customer_name)
+            # Add context to prompt
             if context:
                 full_prompt += context
             
-            # Use emergentintegrations without session persistence (manual history)
+            # Add current message indicator
+            full_prompt += f"\nMENSAGEM ATUAL DO CLIENTE: {user_message}\n"
+            full_prompt += "\nSua resposta (lembre-se: uma pergunta por vez, aguarde resposta, não repita o que já perguntou):"
+            
+            # Use emergentintegrations
             chat = LlmChat(
                 api_key=self.api_key,
-                session_id=session_id,  # Still use for potential future persistence
+                session_id=session_id,
                 system_message=full_prompt
             ).with_model("openai", self.model)
             
