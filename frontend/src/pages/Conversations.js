@@ -327,7 +327,7 @@ const Conversations = () => {
 
               {/* Message Input (only for transferred conversations) */}
               {selectedConversation.transferred_to_human && selectedConversation.status !== 'closed' && (
-                <div className="p-4 border-t border-border mb-16">
+                <div className="p-4 border-t border-border relative z-50 bg-background">
                   <div className="flex gap-2">
                     <Input
                       placeholder="Digite sua mensagem..."
@@ -337,7 +337,7 @@ const Conversations = () => {
                       data-testid="message-input"
                       className="flex-1"
                     />
-                    <Button onClick={handleSendMessage} className="gap-2 shrink-0" data-testid="send-message-button">
+                    <Button onClick={handleSendMessage} className="gap-2 shrink-0 z-50" data-testid="send-message-button">
                       <Send className="w-4 h-4" />
                       Enviar
                     </Button>
