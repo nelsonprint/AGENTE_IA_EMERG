@@ -197,7 +197,7 @@ const Conversations = () => {
                     className={`cursor-pointer hover:border-zinc-700 transition-colors relative ${
                       selectedConversation?.id === conv.id ? 'border-primary' : ''
                     }`}
-                    onClick={() => setSelectedConversation(conv)}
+                    onClick={() => handleSelectConversation(conv)}
                     data-testid={`conversation-item-${conv.id}`}
                   >
                     <CardContent className="p-4">
