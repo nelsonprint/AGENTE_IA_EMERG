@@ -328,16 +328,22 @@ const Conversations = () => {
               {/* Message Input (only for transferred conversations) */}
               {selectedConversation.transferred_to_human && selectedConversation.status !== 'closed' && (
                 <div className="sticky bottom-0 p-4 border-t border-border bg-background" style={{ marginBottom: '60px' }}>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Digite sua mensagem..."
+                  <div className="flex gap-2 items-end">
+                    <Textarea
+                      placeholder="Digite sua mensagem... (Shift+Enter para nova linha)"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
                       data-testid="message-input"
-                      className="flex-1"
+                      className="flex-1 min-h-[80px] max-h-[200px] resize-none"
+                      rows={3}
                     />
-                    <Button onClick={handleSendMessage} className="gap-2 shrink-0" data-testid="send-message-button">
+                    <Button onClick={handleSendMessage} className="gap-2 shrink-0 h-[80px]" data-testid="send-message-button">
                       <Send className="w-4 h-4" />
                       Enviar
                     </Button>
