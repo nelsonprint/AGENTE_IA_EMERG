@@ -476,12 +476,33 @@ async def webhook_handler(webhook_id: str, payload: dict):
             if notification_phone and default_instance:
                 clean_notification_phone = notification_phone.replace("+", "").replace("-", "").replace(" ", "").replace("(", "").replace(")", "")
                 
+                # Get last 3 messages from CLIENT only (not bot)
+                conversation_for_notification = await db.conversations.find_one(
+                    {"id": conversation["id"]},
+                    {"_id": 0, "messages": 1}
+                )
+                
+                client_messages = []
+                if conversation_for_notification and conversation_for_notification.get("messages"):
+                    for msg in conversation_for_notification["messages"]:
+                        if msg.get("sender") == "user":
+                            client_messages.append(msg.get("content", ""))
+                
+                # Get last 3 client messages
+                last_3_client_msgs = client_messages[-3:] if len(client_messages) >= 3 else client_messages
+                
+                # Format messages
+                messages_text = ""
+                for msg in last_3_client_msgs:
+                    messages_text += f'• "{msg}"\n'
+                
                 notification_message = f"""🔔 NOVO ATENDIMENTO SOLICITADO
 
 Cliente: {user_name}
 https://wa.me/+{phone_number}
-Última mensagem: "{message_content}"
-"""
+
+Últimas mensagens do cliente:
+{messages_text}"""
                 
                 instance_service = EvolutionAPIService(
                     default_instance["api_url"],
