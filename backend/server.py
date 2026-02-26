@@ -526,13 +526,30 @@ https://wa.me/+{phone_number}
         session_id = f"session_{phone_number}"
         conversation_history = conversation_with_history.get("messages", [])
         
-        # Generate response with full conversation history and customer name
-        ai_response = await bot_service.generate_response(
-            session_id, 
-            message_content,
-            conversation_history,
-            customer_name=user_name
-        )
+        # Check for menu options or name request BEFORE calling AI
+        menu_result = bot_service.detect_menu_options(message_content)
+        is_name_request = bot_service.detect_name_request(message_content)
+        
+        ai_response = None
+        
+        # If it's a menu with options, respond with the best option number
+        if menu_result["is_menu"] and menu_result["best_option"]:
+            ai_response = str(menu_result["best_option"])
+            logger.info(f"Menu detected! Responding with option: {ai_response}")
+        
+        # If asking for name, respond with "Eduardo"
+        elif is_name_request:
+            ai_response = "Eduardo"
+            logger.info("Name request detected! Responding with: Eduardo")
+        
+        # Otherwise, generate normal AI response
+        else:
+            ai_response = await bot_service.generate_response(
+                session_id, 
+                message_content,
+                conversation_history,
+                customer_name=user_name
+            )
         
         bot_message = Message(
             conversation_id=conversation["id"],
