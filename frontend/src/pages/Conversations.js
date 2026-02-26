@@ -8,7 +8,7 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { toast } from 'sonner';
 import { MessageSquare, User, Bot, ArrowRight, X, Send } from 'lucide-react';
-import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
