@@ -1,6 +1,7 @@
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from typing import Optional, Dict, Any, List
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -11,13 +12,95 @@ class BotService:
         self.model = model
         self.conversations = {}  # In-memory cache of conversations
     
-    def get_conversation_history(self, session_id: str, messages: List[Dict]) -> str:
-        """Build conversation history from MongoDB messages"""
-        history = []
-        for msg in messages[-10:]:  # Last 10 messages for context
-            role = "user" if msg["sender"] == "user" else "assistant"
-            history.append(f"{role}: {msg['content']}")
-        return "\n".join(history)
+    def detect_menu_options(self, message: str) -> dict:
+        """
+        Detect if message contains a numbered menu and extract options.
+        Returns: {"is_menu": bool, "options": {number: description}, "best_option": number or None}
+        """
+        # Patterns for menu options: "1 - Text", "*1* Text", "1) Text", "1. Text"
+        patterns = [
+            r'[\*]?(\d+)[\*]?\s*[-–—\.)\]]\s*([^\n\d]+)',  # *1* - Text or 1 - Text or 1) Text
+            r'(\d+)\s*[-–—]\s*([^\n]+)',  # 1 - Text
+            r'(\d+)\)\s*([^\n]+)',  # 1) Text
+            r'(\d+)\.\s*([^\n]+)',  # 1. Text
+        ]
+        
+        options = {}
+        for pattern in patterns:
+            matches = re.findall(pattern, message, re.IGNORECASE)
+            for match in matches:
+                num = match[0].strip()
+                desc = match[1].strip()
+                if num.isdigit() and desc:
+                    options[int(num)] = desc.lower()
+        
+        if len(options) < 2:
+            return {"is_menu": False, "options": {}, "best_option": None}
+        
+        # Priority keywords for selection
+        priority_keywords = [
+            ["administrativo", "administração", "adm"],
+            ["financeiro", "financeira", "finanças"],
+            ["gerência", "gerente", "gestão", "gestor"],
+            ["obras", "construção", "engenharia"],
+            ["comercial", "vendas", "venda"]
+        ]
+        
+        best_option = None
+        for keywords in priority_keywords:
+            for num, desc in options.items():
+                for keyword in keywords:
+                    if keyword in desc:
+                        best_option = num
+                        break
+                if best_option:
+                    break
+            if best_option:
+                break
+        
+        return {"is_menu": True, "options": options, "best_option": best_option}
+    
+    def detect_name_request(self, message: str) -> bool:
+        """Detect if message is asking for a name"""
+        name_patterns = [
+            r'qual\s+(é\s+)?o?\s*seu\s+nome',
+            r'com\s+quem\s+(eu\s+)?falo',
+            r'quem\s+está\s+falando',
+            r'me\s+informe\s+seu\s+nome',
+            r'informe\s+seu\s+nome',
+            r'seu\s+nome\s*[,:]?\s*por\s+favor',
+            r'poderia\s+me\s+dizer\s+seu\s+nome',
+            r'como\s+você\s+se\s+chama',
+            r'digite\s+seu\s+nome',
+            r'escreva\s+seu\s+nome',
+        ]
+        
+        message_lower = message.lower()
+        for pattern in name_patterns:
+            if re.search(pattern, message_lower):
+                return True
+        return False
+    
+    def detect_bot_response(self, message: str) -> bool:
+        """Detect if message is from an automated bot (to ignore)"""
+        bot_indicators = [
+            "assistente virtual",
+            "pré-atendimento",
+            "agradece seu contato",
+            "em breve um consultor",
+            "em breve entraremos em contato",
+            "atendimento automático",
+            "mensagem automática",
+            "obrigado pelo contato",
+            "aguarde um momento",
+            "sua mensagem foi recebida"
+        ]
+        
+        message_lower = message.lower()
+        for indicator in bot_indicators:
+            if indicator in message_lower:
+                return True
+        return False
     
     def _replace_name_placeholders(self, text: str, customer_name: str) -> str:
         """Replace name placeholders in the prompt with customer's actual name"""
