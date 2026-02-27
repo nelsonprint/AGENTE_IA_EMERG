@@ -43,6 +43,7 @@ class Settings(BaseModel):
     redis_password: Optional[str] = None
     notification_whatsapp: Optional[str] = None  # WhatsApp para receber notificações de transferência
     transfer_keywords: Optional[List[str]] = None  # Palavras-chave que ativam transferência
+    notify_every_keyword: bool = False  # Se True, notifica a cada keyword detectada; se False, apenas uma vez por conversa
     updated_at: datetime = Field(default_factory=get_brazil_time)
 
 class SettingsUpdate(BaseModel):
@@ -56,6 +57,7 @@ class SettingsUpdate(BaseModel):
     redis_password: Optional[str] = None
     notification_whatsapp: Optional[str] = None
     transfer_keywords: Optional[List[str]] = None
+    notify_every_keyword: Optional[bool] = None
 
 class BotPrompt(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -100,6 +102,7 @@ class Conversation(BaseModel):
     last_message_at: datetime = Field(default_factory=get_brazil_time)
     messages: List[Message] = []
     transferred_to_human: bool = False
+    notified_owner: bool = False  # Track if owner was notified about this conversation
 
 class WebhookPayload(BaseModel):
     data: Dict[str, Any]
