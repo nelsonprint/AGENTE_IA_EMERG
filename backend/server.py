@@ -361,6 +361,27 @@ async def delete_conversation(
     logger.info(f"Conversation {conversation_id} deleted by user")
     return {"message": "Conversation deleted successfully"}
 
+
+@api_router.post("/conversations/{conversation_id}/reset-notification")
+async def reset_notification_status(
+    conversation_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Reset the notified_owner flag to allow new notifications for this conversation"""
+    conversation = await db.conversations.find_one({"id": conversation_id}, {"_id": 0})
+    
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    await db.conversations.update_one(
+        {"id": conversation_id},
+        {"$set": {"notified_owner": False}}
+    )
+    
+    logger.info(f"Notification status reset for conversation {conversation_id}")
+    return {"message": "Notification status reset - new keywords will trigger notification"}
+
+
 @api_router.post("/webhook/{webhook_id}")
 async def webhook_handler(webhook_id: str, payload: dict):
     try:
