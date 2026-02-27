@@ -476,15 +476,21 @@ async def webhook_handler(webhook_id: str, payload: dict):
         )
         
         # If keyword detected, send notification but continue conversation normally
-        if should_transfer and not conversation.get("notified_owner"):
-            # Mark that we already notified for this conversation (avoid spam)
-            await db.conversations.update_one(
-                {"id": conversation["id"]},
-                {"$set": {"notified_owner": True}}
-            )
+        # Check if we should notify (either notify_every_keyword is True, or conversation not yet notified)
+        notify_every_keyword = settings.get("notify_every_keyword", False)
+        should_notify = should_transfer and (notify_every_keyword or not conversation.get("notified_owner"))
+        
+        if should_notify:
+            # Mark that we already notified for this conversation (avoid spam in single-notify mode)
+            if not notify_every_keyword:
+                await db.conversations.update_one(
+                    {"id": conversation["id"]},
+                    {"$set": {"notified_owner": True}}
+                )
             
             # Send notification to owner's WhatsApp
             notification_phone = settings.get("notification_whatsapp")
+            logger.info(f"Notification check: notify_every_keyword={notify_every_keyword}, should_notify={should_notify}, notification_phone={notification_phone}, has_instance={default_instance is not None}")
             if notification_phone and default_instance:
                 clean_notification_phone = notification_phone.replace("+", "").replace("-", "").replace(" ", "").replace("(", "").replace(")", "")
                 
