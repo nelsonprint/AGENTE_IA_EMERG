@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Save, Plus, X } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
+import { Switch } from '../components/ui/switch';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -27,7 +28,8 @@ const Settings = () => {
     redis_url: '',
     redis_password: '',
     notification_whatsapp: '',
-    transfer_keywords: []
+    transfer_keywords: [],
+    notify_every_keyword: false
   });
   const [newKeyword, setNewKeyword] = useState('');
 
@@ -43,7 +45,8 @@ const Settings = () => {
       // Garantir que transfer_keywords seja sempre um array
       setSettings({
         ...response.data,
-        transfer_keywords: response.data.transfer_keywords || []
+        transfer_keywords: response.data.transfer_keywords || [],
+        notify_every_keyword: response.data.notify_every_keyword || false
       });
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -257,6 +260,24 @@ const Settings = () => {
           <p className="text-xs text-muted-foreground">
             Exemplos: "falar com gerente", "quero falar com dono", "atendimento humano", "tenho interesse", "como comprar"
           </p>
+          
+          <div className="flex items-center justify-between pt-4 border-t border-border/50 mt-4">
+            <div className="space-y-1">
+              <Label htmlFor="notify_every_keyword" className="text-sm font-medium">
+                Notificar a cada palavra-chave detectada
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Se ativado, você receberá uma notificação cada vez que uma palavra-chave for detectada. 
+                Se desativado, apenas uma notificação por conversa.
+              </p>
+            </div>
+            <Switch
+              id="notify_every_keyword"
+              checked={settings.notify_every_keyword || false}
+              onCheckedChange={(checked) => setSettings({ ...settings, notify_every_keyword: checked })}
+              data-testid="notify-every-keyword-switch"
+            />
+          </div>
         </CardContent>
       </Card>
 
