@@ -480,6 +480,28 @@ async def webhook_handler(webhook_id: str, payload: dict):
                     {"$set": {"user_name": user_name}}
                 )
                 conversation["user_name"] = user_name
+            
+            # Auto-reset notified_owner after 2 hours of inactivity
+            # This allows new notifications when the customer comes back later
+            if conversation.get("notified_owner") and conversation.get("last_message_at"):
+                try:
+                    last_msg_time = conversation["last_message_at"]
+                    if isinstance(last_msg_time, str):
+                        last_msg_time = datetime.fromisoformat(last_msg_time.replace('Z', '+00:00'))
+                    if last_msg_time.tzinfo is None:
+                        last_msg_time = SAO_PAULO_TZ.localize(last_msg_time)
+                    
+                    hours_since_last_msg = (get_brazil_time() - last_msg_time).total_seconds() / 3600
+                    
+                    if hours_since_last_msg >= 2:
+                        logger.info(f"Auto-resetting notification status for {phone_number} (inactive for {hours_since_last_msg:.1f}h)")
+                        await db.conversations.update_one(
+                            {"id": conversation["id"]},
+                            {"$set": {"notified_owner": False}}
+                        )
+                        conversation["notified_owner"] = False
+                except Exception as e:
+                    logger.warning(f"Error checking last message time: {e}")
         
         user_message = Message(
             conversation_id=conversation["id"],
