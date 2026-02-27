@@ -49,6 +49,8 @@ const Settings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      console.log('Salvando settings:', settings);
+      console.log('Transfer keywords:', settings.transfer_keywords);
       await axios.put(`${API}/settings`, settings, getAuthHeader());
       toast.success('Configurações salvas com sucesso!');
     } catch (error) {
