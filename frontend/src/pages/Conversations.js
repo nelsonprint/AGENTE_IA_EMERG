@@ -7,7 +7,7 @@ import { Badge } from '../components/ui/badge';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { toast } from 'sonner';
-import { MessageSquare, User, Bot, ArrowRight, X, Send } from 'lucide-react';
+import { MessageSquare, User, Bot, ArrowRight, X, Send, Bell, BellOff } from 'lucide-react';
 import { Textarea } from '../components/ui/textarea';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -117,6 +117,17 @@ const Conversations = () => {
     }
   };
 
+  const handleResetNotification = async (conversationId) => {
+    try {
+      await axios.post(`${API}/conversations/${conversationId}/reset-notification`, {}, getAuthHeader());
+      toast.success('Status de notificação resetado - novas palavras-chave irão disparar notificação');
+      fetchConversations();
+    } catch (error) {
+      toast.error('Erro ao resetar status de notificação');
+      console.error('Error resetting notification:', error);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!message.trim() || !selectedConversation) return;
     
@@ -215,6 +226,12 @@ const Conversations = () => {
                           <Badge className={getStatusColor(conv.status)}>
                             {getStatusLabel(conv.status)}
                           </Badge>
+                          {/* Notification Status Indicator */}
+                          {conv.notified_owner && (
+                            <span title="Notificação já enviada" className="text-amber-500">
+                              <Bell className="w-4 h-4" />
+                            </span>
+                          )}
                           {/* Delete Button */}
                           <button
                             onClick={(e) => handleDelete(conv.id, e)}
@@ -255,6 +272,19 @@ const Conversations = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  {/* Reset Notification Button */}
+                  {selectedConversation.notified_owner && (
+                    <Button
+                      variant="outline"
+                      onClick={() => handleResetNotification(selectedConversation.id)}
+                      className="gap-2"
+                      data-testid="reset-notification-button"
+                      title="Permite que novas palavras-chave disparem notificação"
+                    >
+                      <BellOff className="w-4 h-4" />
+                      Resetar Notificação
+                    </Button>
+                  )}
                   {!selectedConversation.transferred_to_human && selectedConversation.status === 'active' && (
                     <Button
                       variant="outline"
