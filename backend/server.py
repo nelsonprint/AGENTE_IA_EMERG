@@ -150,6 +150,16 @@ async def update_settings(
     existing = await db.settings.find_one({}, {"_id": 0})
     
     update_data = settings_update.model_dump(exclude_unset=True)
+    
+    # Log para debug
+    logger.info(f"Recebido para salvar - transfer_keywords: {settings_update.transfer_keywords}")
+    logger.info(f"update_data: {update_data.keys()}")
+    
+    # Garantir que transfer_keywords seja salvo mesmo se for lista vazia
+    if settings_update.transfer_keywords is not None:
+        update_data["transfer_keywords"] = settings_update.transfer_keywords
+        logger.info(f"Salvando {len(settings_update.transfer_keywords)} palavras-chave")
+    
     update_data["updated_at"] = get_brazil_time().isoformat()
     
     if existing:
