@@ -14,13 +14,14 @@ Build a complete web application to replace and enhance an existing N8N automati
 - Support for multiple Evolution API instances
 - AI conversation memory
 - Dynamic customer name insertion in prompts
+- Notification system with keyword detection
 
 ## Architecture
 ```
 /app
 ├── backend/
 │   ├── server.py          # FastAPI main application
-│   ├── bot_service.py     # AI/LLM service with name placeholder replacement
+│   ├── bot_service.py     # AI/LLM service with keyword detection
 │   ├── evolution_service.py # Evolution API integration
 │   ├── redis_service.py   # Redis session management
 │   ├── supabase_service.py # Supabase connection
@@ -34,11 +35,12 @@ Build a complete web application to replace and enhance an existing N8N automati
 
 ## Tech Stack
 - **Backend:** FastAPI, Python, Motor (MongoDB async driver)
-- **Frontend:** React.js
+- **Frontend:** React.js, Tailwind CSS, Shadcn/UI
 - **Database:** MongoDB (local), Supabase (optional via settings)
 - **Cache:** Redis (optional, for conversation memory)
 - **AI:** OpenAI GPT-4o-mini via emergentintegrations
 - **WhatsApp:** Evolution API
+- **Timezone:** America/Sao_Paulo
 
 ## Implemented Features (Feb 2026)
 
@@ -53,48 +55,90 @@ Build a complete web application to replace and enhance an existing N8N automati
 - [x] Conversation listing and history
 - [x] Human transfer detection
 - [x] Dashboard statistics
+- [x] Delete conversations
 
-### P0 Feature - Dynamic Name Substitution (Completed Feb 9, 2026)
+### P0 Feature - Keyword Notification System (Completed Feb 27, 2026)
+- [x] Custom keyword management via UI (add/remove keywords)
+- [x] Keyword detection in incoming messages
+- [x] WhatsApp notification to owner when keyword detected
+- [x] Notification includes customer name and last 3 messages
+- [x] Two modes: 
+  - Single notification per conversation (default)
+  - Notify on every keyword detection (optional toggle)
+- [x] Reset notification status button in conversation view
+- [x] Visual indicator (bell icon) for notified conversations
+- [x] **89 custom keywords configured** by user
+
+### Dynamic Name Substitution
 - [x] Extract customer name (`pushName`) from Evolution API webhook
 - [x] Replace placeholders in prompts with customer's actual name
-- Supported placeholders:
-  - `[Nome do Proprietário]`
-  - `[Nome do Cliente]`
-  - `[customer_name]`
-  - `[nome]`
-  - `{nome}`
-  - `{customer_name}`
-  - `{{nome}}`
-  - `{{customer_name}}`
-- Falls back to "Cliente" if name is unavailable
+- [x] Falls back to "Cliente" if name is unavailable
+
+### Bot/Menu Detection
+- [x] Auto-detect numbered menus from other bots
+- [x] Smart department selection (Administrativo, Financeiro, etc.)
+- [x] Name request detection and auto-response
 
 ## API Endpoints
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
-- `GET/PUT /api/settings` - Manage settings
+- `GET/PUT /api/settings` - Manage settings (includes transfer_keywords, notify_every_keyword)
 - `GET/POST/PUT/DELETE /api/prompts` - Manage prompts
 - `GET /api/prompts/active` - Get active prompt
 - `GET /api/conversations` - List conversations
+- `GET /api/conversations/{id}` - Get single conversation
 - `POST /api/conversations/{id}/transfer` - Transfer to human
+- `POST /api/conversations/{id}/close` - Close conversation
+- `DELETE /api/conversations/{id}` - Delete conversation
+- `POST /api/conversations/{id}/reset-notification` - Reset notification status
 - `POST /api/webhook/{webhook_id}` - Receive Evolution API webhooks
+- `POST /api/send-message` - Send manual message
 - `GET/POST/DELETE /api/evolution-instances` - Manage instances
+- `POST /api/evolution-instances/{id}/set-default` - Set default instance
+- `POST /api/evolution-instances/{id}/test` - Test instance connection
+
+## Data Models
+
+### Settings
+```python
+{
+  notification_whatsapp: str,      # Phone to receive notifications
+  transfer_keywords: List[str],    # Custom keywords for transfer
+  notify_every_keyword: bool,      # If True, notify on every keyword
+  openai_api_key: str,
+  evolution_api_url: str,
+  evolution_api_key: str,
+  ...
+}
+```
+
+### Conversation
+```python
+{
+  id: str,
+  phone_number: str,
+  user_name: str,
+  status: str,  # active, transferred, closed
+  notified_owner: bool,  # True if notification was sent
+  messages: List[Message],
+  ...
+}
+```
 
 ## Backlog
 
 ### P1 - High Priority
-- [ ] Real-time conversation monitoring (WebSockets/polling)
-- [ ] Improved human handoff workflow
+- [ ] Implement `indice_contato` logic (rotate 5 opening messages)
+- [ ] Refactor monolithic server.py into service modules
 
-### P2 - Medium Priority
-- [ ] Enhanced prompt management UX
-- [ ] Conversation analytics
+### P2 - Medium Priority  
+- [ ] WebSocket for real-time conversation updates
+- [ ] Full human handoff UI (claim conversation, pause bot)
 
 ### P3 - Low Priority
+- [ ] Conversation analytics
 - [ ] Multi-language support
-- [ ] Bulk message sending
 
-## Usage Notes
-To use dynamic name in prompts, include any of the supported placeholders in your prompt text. Example:
-```
-Olá [Nome do Proprietário], sou um assistente virtual da Lucro Líquido. Como posso ajudá-lo?
-```
+## Testing Credentials
+- **User:** admin
+- **Password:** admin123
