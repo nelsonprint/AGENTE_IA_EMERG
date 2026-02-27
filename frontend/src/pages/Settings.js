@@ -38,7 +38,13 @@ const Settings = () => {
   const fetchSettings = async () => {
     try {
       const response = await axios.get(`${API}/settings`, getAuthHeader());
-      setSettings(response.data);
+      console.log('Settings carregados:', response.data);
+      console.log('Transfer keywords carregados:', response.data.transfer_keywords);
+      // Garantir que transfer_keywords seja sempre um array
+      setSettings({
+        ...response.data,
+        transfer_keywords: response.data.transfer_keywords || []
+      });
     } catch (error) {
       console.error('Error fetching settings:', error);
     } finally {
